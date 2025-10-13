@@ -89,11 +89,10 @@ const DEFAULT_SETTINGS: TMDBPluginSettings = {
 	lastUsedTVFolder: 'TMDB/TV Shows',
 	lastUsedAnimeFolder: 'TMDB/Anime',
 	movieTemplate: `---
-
 type: movie
 subType: ""
-title: "{{title}}"
-englishTitle: "{{original_title}}"
+title: {{title}}
+englishTitle: {{original_title}}
 year: "{{year}}"
 dataSource: OMDbAPI
 url: https://www.imdb.com/title/{{id}}/
@@ -119,13 +118,12 @@ watched: false
 lastWatched: ""
 personalRating: 0
 tags: 
-  - tmdb/movies
+  - mediaDB/tv/movie
 categories:
   - "[[Movies]]"
 created: {{current_date}}
 ---`,
 	tvTemplate: `---
-
 type: series
 subType: ""
 title: "{{name}}"
@@ -155,7 +153,7 @@ watched: false
 lastWatched: ""
 personalRating: 0
 tags: 
-  - tmdb/series
+  - mediaDB/tv/series
 categories:
   - "[[Series]]"
 created: {{current_date}}
@@ -459,9 +457,9 @@ export default class TMDBPlugin extends Plugin {
 		// Adjust tag based on anime detection
 		const movieIsAnime = this.isAnime(movie);
 		if (movieIsAnime) {
-			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/anime\n' + 'categories:');
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - mediaDB/tv/anime\n' + 'categories:');
 		} else {
-			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/movies\n' + 'categories:');
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - mediaDB/tv/movie\n' + 'categories:');
 		}
 
 		// Ensure title and englishTitle are quoted (in case user template removed quotes)
@@ -574,9 +572,9 @@ export default class TMDBPlugin extends Plugin {
 		// Adjust tag based on anime detection
 		const tvIsAnime = this.isAnime(tvShow);
 		if (tvIsAnime) {
-			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/anime\n' + 'categories:');
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - mediaDB/tv/anime\n' + 'categories:');
 		} else {
-			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/series\n' + 'categories:');
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - mediaDB/tv/series\n' + 'categories:');
 		}
 
 		// Ensure title and englishTitle are quoted (in case user template removed quotes)
