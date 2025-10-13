@@ -89,10 +89,11 @@ const DEFAULT_SETTINGS: TMDBPluginSettings = {
 	lastUsedTVFolder: 'TMDB/TV Shows',
 	lastUsedAnimeFolder: 'TMDB/Anime',
 	movieTemplate: `---
+
 type: movie
 subType: ""
-title: {{title}}
-englishTitle: {{original_title}}
+title: "{{title}}"
+englishTitle: "{{original_title}}"
 year: "{{year}}"
 dataSource: OMDbAPI
 url: https://www.imdb.com/title/{{id}}/
@@ -118,12 +119,13 @@ watched: false
 lastWatched: ""
 personalRating: 0
 tags: 
-  - mediaDB/tv/movie
+  - tmdb/movies
 categories:
   - "[[Movies]]"
 created: {{current_date}}
 ---`,
 	tvTemplate: `---
+
 type: series
 subType: ""
 title: "{{name}}"
@@ -153,7 +155,7 @@ watched: false
 lastWatched: ""
 personalRating: 0
 tags: 
-  - mediaDB/tv/series
+  - tmdb/series
 categories:
   - "[[Series]]"
 created: {{current_date}}
@@ -402,10 +404,13 @@ export default class TMDBPlugin extends Plugin {
 				duration = `${movieDetails.runtime} min`;
 			}
 			
-			// Format premiere date (MM/DD/YYYY format)
+			// Format premiere date (ISO YYYY-MM-DD)
 			if (movieDetails.release_date) {
 				const releaseDate = new Date(movieDetails.release_date);
-				premiereDate = releaseDate.toLocaleDateString('en-US');
+				const yyyy = releaseDate.getFullYear();
+				const mm = String(releaseDate.getMonth() + 1).padStart(2, '0');
+				const dd = String(releaseDate.getDate()).padStart(2, '0');
+				premiereDate = `${yyyy}-${mm}-${dd}`;
 			}
 		}
 		
@@ -415,7 +420,16 @@ export default class TMDBPlugin extends Plugin {
 		template = template.replace(/\{\{overview\}\}/g, movie.overview || 'No overview available');
 		template = template.replace(/\{\{rating\}\}/g, movie.vote_average.toFixed(1));
 		template = template.replace(/\{\{vote_count\}\}/g, movie.vote_count.toString());
-		template = template.replace(/\{\{release_date\}\}/g, movie.release_date || 'N/A');
+		// Normalize release_date to ISO when possible
+		if (movie.release_date) {
+			const d = new Date(movie.release_date);
+			const yyyy = d.getFullYear();
+			const mm = String(d.getMonth() + 1).padStart(2, '0');
+			const dd = String(d.getDate()).padStart(2, '0');
+			template = template.replace(/\{\{release_date\}\}/g, `${yyyy}-${mm}-${dd}`);
+		} else {
+			template = template.replace(/\{\{release_date\}\}/g, 'N/A');
+		}
 		template = template.replace(/\{\{language\}\}/g, movie.original_language);
 		template = template.replace(/\{\{original_title\}\}/g, movie.original_title);
 		template = template.replace(/\{\{popularity\}\}/g, movie.popularity.toFixed(1));
@@ -442,34 +456,89 @@ export default class TMDBPlugin extends Plugin {
 		template = template.replace(/\{\{duration\}\}/g, duration);
 		template = template.replace(/\{\{premiere_date\}\}/g, premiereDate);
 		
+		// Adjust tag based on anime detection
+		const movieIsAnime = this.isAnime(movie);
+		if (movieIsAnime) {
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/anime\n' + 'categories:');
+		} else {
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/movies\n' + 'categories:');
+		}
+
+		// Ensure title and englishTitle are quoted (in case user template removed quotes)
+		template = template.replace(/(^title:\s*)([^"\n].*)$/m, (m, p1, p2) => `${p1}"${p2.replace(/"/g, '\\"')}"`);
+		template = template.replace(/(^englishTitle:\s*)([^"\n].*)$/m, (m, p1, p2) => `${p1}"${p2.replace(/"/g, '\\"')}"`);
+		
 		return template;
 	}
 
 	// Format TV show data for insertion
-	formatTVData(tvShow: TMDBTVShow): string {
+	async formatTVData(tvShow: TMDBTVShow): Promise<string> {
 		let template = this.settings.tvTemplate;
+		
+		// Fetch detailed TV show information (including credits)
+		const tvDetails = await this.getTVShowDetails(tvShow.id);
 		
 		const year = tvShow.first_air_date ? new Date(tvShow.first_air_date).getFullYear() : 'N/A';
 		const posterUrl = tvShow.poster_path ? `https://image.tmdb.org/t/p/w500${tvShow.poster_path}` : '';
 		const backdropUrl = tvShow.backdrop_path ? `https://image.tmdb.org/t/p/w1280${tvShow.backdrop_path}` : '';
-		const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+		const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 		
-		// Format year range (for now, just use single year)
-		const yearRange = year.toString();
+		// Year range (fallback single year)
+		let yearRange = year.toString();
 		
-		// Format first air date (MM/DD/YYYY format)
-		const firstAirDateFormatted = tvShow.first_air_date ? 
-			new Date(tvShow.first_air_date).toLocaleDateString('en-US') : 'unknown';
+		// Dates ISO
+		const firstAirISO = tvShow.first_air_date ? (() => { const d = new Date(tvShow.first_air_date); const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; })() : 'unknown';
+		let lastAirISO = 'unknown';
+		let isAiring = false;
 		
-		// Format last air date (for now, set to unknown)
-		const lastAirDateFormatted = 'unknown';
+		// Defaults
+		let genresList = '  - TBD';
+		let createdByList = '  - TBD';
+		let networksList = '  - TBD';
+		let actorsList = '  - TBD';
+		let numberOfEpisodes = 0;
+		let episodeRunTime = 24;
 		
-		// Determine if series is still airing (simplified logic)
-		const isAiring = false; // Default to false, can be enhanced later
-		
-		// Default values for missing data
-		const numberOfEpisodes = 0; // TMDB search doesn't provide episode count
-		const episodeRunTime = 24; // Default 24 minutes
+		if (tvDetails) {
+			// genres
+			if (tvDetails.genres && tvDetails.genres.length > 0) {
+				genresList = tvDetails.genres.map((g: any) => `  - ${g.name}`).join('\n');
+			}
+			// created_by -> writers
+			if (tvDetails.created_by && tvDetails.created_by.length > 0) {
+				createdByList = tvDetails.created_by.map((p: any) => `  - ${p.name}`).join('\n');
+			}
+			// networks -> studio
+			if (tvDetails.networks && tvDetails.networks.length > 0) {
+				networksList = tvDetails.networks.map((n: any) => `  - ${n.name}`).join('\n');
+			}
+			// cast
+			if (tvDetails.credits && tvDetails.credits.cast) {
+				const topActors = tvDetails.credits.cast.slice(0, 5);
+				if (topActors.length > 0) {
+					actorsList = topActors.map((a: any) => `  - ${a.name}`).join('\n');
+				}
+			}
+			// episodes / runtime
+			if (typeof tvDetails.number_of_episodes === 'number') {
+				numberOfEpisodes = tvDetails.number_of_episodes;
+			}
+			if (Array.isArray(tvDetails.episode_run_time) && tvDetails.episode_run_time.length > 0) {
+				episodeRunTime = tvDetails.episode_run_time[0];
+			}
+			// airing and dates
+			if (tvDetails.status) {
+				isAiring = tvDetails.status.toLowerCase() === 'returning series' || tvDetails.status.toLowerCase() === 'in production';
+			}
+			if (tvDetails.first_air_date) {
+				const d = new Date(tvDetails.first_air_date); const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0');
+				yearRange = tvDetails.last_air_date ? `${yyyy}-${new Date(tvDetails.last_air_date).getFullYear()}` : `${yyyy}-${isAiring ? 'present' : yyyy}`;
+			}
+			if (tvDetails.last_air_date) {
+				const ld = new Date(tvDetails.last_air_date); const ly = ld.getFullYear(); const lm = String(ld.getMonth()+1).padStart(2,'0'); const ldD = String(ld.getDate()).padStart(2,'0');
+				lastAirISO = `${ly}-${lm}-${ldD}`;
+			}
+		}
 		
 		// Replace placeholders
 		template = template.replace(/\{\{name\}\}/g, tvShow.name);
@@ -477,8 +546,8 @@ export default class TMDBPlugin extends Plugin {
 		template = template.replace(/\{\{overview\}\}/g, tvShow.overview || 'No overview available');
 		template = template.replace(/\{\{rating\}\}/g, tvShow.vote_average.toFixed(1));
 		template = template.replace(/\{\{vote_count\}\}/g, tvShow.vote_count.toString());
-		template = template.replace(/\{\{first_air_date_formatted\}\}/g, firstAirDateFormatted);
-		template = template.replace(/\{\{last_air_date_formatted\}\}/g, lastAirDateFormatted);
+		template = template.replace(/\{\{first_air_date_formatted\}\}/g, firstAirISO);
+		template = template.replace(/\{\{last_air_date_formatted\}\}/g, lastAirISO);
 		template = template.replace(/\{\{language\}\}/g, tvShow.original_language);
 		template = template.replace(/\{\{original_name\}\}/g, tvShow.original_name);
 		template = template.replace(/\{\{popularity\}\}/g, tvShow.popularity.toFixed(1));
@@ -490,28 +559,29 @@ export default class TMDBPlugin extends Plugin {
 		template = template.replace(/\{\{number_of_episodes\}\}/g, numberOfEpisodes.toString());
 		template = template.replace(/\{\{episode_run_time\}\}/g, episodeRunTime.toString());
 		
-		// Always include poster URL in YAML format
+		// Always include poster URL in YAML format and strip legacy markdown
 		template = template.replace(/\{\{poster_url\}\}/g, posterUrl);
-		
-		// Remove any markdown elements that might be in old templates
 		template = template.replace(/!\[.*?\]\(.*?\)/g, '');
 		template = template.replace(/\*\*.*?\*\*/g, '');
 		template = template.replace(/##.*$/gm, '');
 		template = template.replace(/---\s*\*Data from.*$/gm, '');
 		
-		// Handle genres - create YAML list format
-		const genresList = tvShow.genre_ids.length > 0 ? 
-			tvShow.genre_ids.map(id => `  - Genre ${id}`).join('\n') : 
-			'  - TBD';
+		// Apply lists
 		template = template.replace(/\{\{genres_list\}\}/g, genresList);
-		
-		// Handle created_by (writers) - empty for now since TMDB search doesn't provide this
-		const createdByList = '  - TBD';
 		template = template.replace(/\{\{created_by_list\}\}/g, createdByList);
-		
-		// Handle networks (studio) - empty for now since TMDB search doesn't provide this
-		const networksList = '  - TBD';
 		template = template.replace(/\{\{networks_list\}\}/g, networksList);
+		
+		// Adjust tag based on anime detection
+		const tvIsAnime = this.isAnime(tvShow);
+		if (tvIsAnime) {
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/anime\n' + 'categories:');
+		} else {
+			template = template.replace(/\n\s*tags:\s*[\s\S]*?\n\s*categories:/, '\n' + 'tags:\n  - tmdb/series\n' + 'categories:');
+		}
+
+		// Ensure title and englishTitle are quoted (in case user template removed quotes)
+		template = template.replace(/(^title:\s*)([^"\n].*)$/m, (m, p1, p2) => `${p1}\"${p2.replace(/\"/g, '\\"')}\"`);
+		template = template.replace(/(^englishTitle:\s*)([^"\n].*)$/m, (m, p1, p2) => `${p1}\"${p2.replace(/\"/g, '\\"')}\"`);
 		
 		return template;
 	}
@@ -896,7 +966,7 @@ class TMDBModal extends Modal {
 				if ('title' in item) {
 					formattedData = await this.plugin.formatMovieData(item as TMDBMovie);
 				} else {
-					formattedData = this.plugin.formatTVData(item as TMDBTVShow);
+					formattedData = await this.plugin.formatTVData(item as TMDBTVShow);
 				}
 				
 				this.plugin.showPreview(formattedData, item);
@@ -908,7 +978,7 @@ class TMDBModal extends Modal {
 				if ('title' in item) {
 					formattedData = await this.plugin.formatMovieData(item as TMDBMovie);
 				} else {
-					formattedData = this.plugin.formatTVData(item as TMDBTVShow);
+					formattedData = await this.plugin.formatTVData(item as TMDBTVShow);
 				}
 				
 				this.plugin.insertIntoEditor(formattedData);
@@ -924,7 +994,7 @@ class TMDBModal extends Modal {
 					formattedData = await this.plugin.formatMovieData(item as TMDBMovie);
 					fileName = this.plugin.settings.fileNameTemplate;
 				} else {
-					formattedData = this.plugin.formatTVData(item as TMDBTVShow);
+					formattedData = await this.plugin.formatTVData(item as TMDBTVShow);
 					fileName = this.plugin.settings.fileNameTemplate;
 				}
 				
