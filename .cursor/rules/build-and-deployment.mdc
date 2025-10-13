@@ -1,0 +1,40 @@
+---
+description: Build process, deployment, and release management guidelines
+---
+
+# Build and Deployment Rules
+
+## Build Configuration
+The project uses esbuild for bundling as configured in [esbuild.config.mjs](mdc:esbuild.config.mjs).
+
+### Development Workflow
+1. Run `npm run dev` for watch mode compilation
+2. Changes to [main.ts](mdc:main.ts) automatically compile to `main.js`
+3. Reload Obsidian to test changes
+4. Enable plugin in **Settings → Community plugins**
+
+### Production Build
+- Run `npm run build` for production build
+- Includes TypeScript type checking (`tsc -noEmit -skipLibCheck`)
+- Creates minified `main.js` with banner comment
+- No source maps in production build
+
+## Release Management
+- Update version in [manifest.json](mdc:manifest.json) using semantic versioning
+- Update [versions.json](mdc:versions.json) with version compatibility mapping
+- Use `npm run version` to automate version bumping
+- Create GitHub release with exact version tag (no 'v' prefix)
+
+## File Requirements for Release
+- `main.js` - Compiled plugin code
+- `manifest.json` - Plugin metadata
+- `styles.css` - Optional styling (if present)
+
+## Manual Installation
+Copy release files to: `<Vault>/.obsidian/plugins/<plugin-id>/`
+
+## Dependencies
+- External dependencies are bundled into `main.js`
+- Obsidian API is external dependency (not bundled)
+- Node.js built-ins are external dependencies
+- CodeMirror packages are external dependencies

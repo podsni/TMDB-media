@@ -1,0 +1,72 @@
+---
+description: Obsidian API usage patterns and best practices
+---
+
+# Obsidian API Guidelines
+
+## Core API Objects
+- `App` - Main application instance
+- `Plugin` - Base class for all plugins
+- `Editor` - Text editor instance
+- `MarkdownView` - Markdown file view
+- `Modal` - Base class for modal dialogs
+- `PluginSettingTab` - Base class for settings UI
+- `Notice` - User notification system
+
+## Command Registration Patterns
+
+### Simple Commands
+```typescript
+this.addCommand({
+    id: 'unique-command-id',
+    name: 'User-friendly name',
+    callback: () => this.executeCommand()
+});
+```
+
+### Editor Commands
+```typescript
+this.addCommand({
+    id: 'editor-command',
+    name: 'Editor action',
+    editorCallback: (editor: Editor, view: MarkdownView) => {
+        // Access editor and view
+    }
+});
+```
+
+### Conditional Commands
+```typescript
+this.addCommand({
+    id: 'conditional-command',
+    name: 'Conditional action',
+    checkCallback: (checking: boolean) => {
+        const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (markdownView) {
+            if (!checking) {
+                this.executeCommand();
+            }
+            return true;
+        }
+        return false;
+    }
+});
+```
+
+## Event Registration
+- Use `this.registerEvent()` for app-level events
+- Use `this.registerDomEvent()` for DOM events
+- Use `this.registerInterval()` for timers
+- All events are automatically cleaned up on plugin unload
+
+## Settings Management
+- Define settings interface with proper types
+- Use `this.loadData()` and `this.saveData()` for persistence
+- Implement settings tab extending `PluginSettingTab`
+- Provide sensible defaults
+
+## UI Components
+- Extend `Modal` for custom dialogs
+- Use `Setting` class for settings UI
+- Access DOM elements through `contentEl` or `containerEl`
+- Clean up DOM elements in `onClose()` methods

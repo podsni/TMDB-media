@@ -1,0 +1,52 @@
+---
+description: Development workflow, testing, and debugging guidelines
+---
+
+# Development Workflow
+
+## Getting Started
+1. Clone the repository to `.obsidian/plugins/<plugin-name>/`
+2. Run `npm install` to install dependencies
+3. Run `npm run dev` to start development build
+4. Enable plugin in **Settings → Community plugins**
+5. Reload Obsidian to load the plugin
+
+## Development Commands
+- `npm run dev` - Start development build with watch mode
+- `npm run build` - Create production build
+- `npm run version` - Bump version and update files
+- `eslint main.ts` - Run code analysis (if eslint is installed)
+
+## Testing Workflow
+1. Make changes to [main.ts](mdc:main.ts) or other source files
+2. Changes automatically compile to `main.js` in dev mode
+3. Reload Obsidian (Ctrl/Cmd + R) to test changes
+4. Check console for errors and debug information
+5. Test on different file types and scenarios
+
+## Debugging Tips
+- Use `console.log()` for debugging (removed in production build)
+- Check Obsidian's developer console for errors
+- Use `new Notice()` for user feedback during development
+- Test with different vault configurations
+- Verify plugin loads correctly after Obsidian restart
+
+## Code Quality
+- Use TypeScript strict mode (enabled in [tsconfig.json](mdc:tsconfig.json))
+- Follow ESLint recommendations if configured
+- Write self-documenting code with clear variable names
+- Add comments for complex logic
+- Keep functions focused and small
+
+## File Management
+- Don't commit `main.js` or `node_modules/` to version control
+- Keep source files in TypeScript (.ts)
+- Use meaningful file names and organization
+- Document any external dependencies or requirements
+
+## Plugin Lifecycle Testing
+- Test plugin loading and unloading
+- Verify all registered events are cleaned up
+- Test settings persistence across reloads
+- Ensure commands work in different contexts
+- Test error handling and edge cases

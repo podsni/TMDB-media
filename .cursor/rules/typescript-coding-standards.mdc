@@ -1,0 +1,37 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript coding standards and best practices for Obsidian plugins
+---
+
+# TypeScript Coding Standards
+
+## Type Safety
+- Always use TypeScript interfaces for plugin settings
+- Define proper types for all function parameters and return values
+- Use `strictNullChecks: true` (enabled in [tsconfig.json](mdc:tsconfig.json))
+- Avoid `any` type - use proper typing instead
+
+## Code Style
+- Use semicolons consistently
+- Use `async/await` over Promise chains
+- Prefer `const` over `let` when possible
+- Use meaningful variable and function names
+- Add JSDoc comments for complex functions
+
+## Obsidian API Usage
+- Import only needed types from 'obsidian' package
+- Use proper typing for Obsidian API objects (App, Editor, MarkdownView, etc.)
+- Handle async operations properly with try/catch blocks
+- Use Obsidian's built-in error handling (Notice class for user feedback)
+
+## Plugin Development Patterns
+- Always check if conditions are met before executing commands
+- Use `checkCallback` for conditional command registration
+- Implement proper error handling for file operations
+- Clean up resources in `onunload()` method
+
+## File Organization
+- Keep classes focused on single responsibility
+- Separate UI components (Modals, SettingTabs) into their own classes
+- Use descriptive class names (avoid generic names like "MyPlugin")
+- Group related functionality together

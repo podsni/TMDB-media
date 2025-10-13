@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+description: Obsidian plugin project structure and architecture guidelines
+---
+
+# Obsidian Plugin Development Rules
+
+## Project Structure
+This is an Obsidian community plugin built with TypeScript. The main entry point is [main.ts](mdc:main.ts) which gets compiled to `main.js` and loaded by Obsidian.
+
+### Key Files
+- [main.ts](mdc:main.ts) - Main plugin entry point and lifecycle management
+- [manifest.json](mdc:manifest.json) - Plugin metadata and configuration
+- [package.json](mdc:package.json) - Node.js dependencies and build scripts
+- [esbuild.config.mjs](mdc:esbuild.config.mjs) - Build configuration using esbuild
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript compiler configuration
+- [styles.css](mdc:styles.css) - Plugin-specific CSS styles
+
+### Build Process
+- Development: `npm run dev` (watch mode with esbuild)
+- Production: `npm run build` (TypeScript check + esbuild production build)
+- Output: `main.js` (bundled JavaScript file)
+
+## Plugin Architecture Guidelines
+
+### Plugin Class Structure
+- Extend `Plugin` class from obsidian
+- Implement `onload()` for initialization
+- Implement `onunload()` for cleanup
+- Use `this.addCommand()` for command registration
+- Use `this.addSettingTab()` for settings UI
+
+### Settings Management
+- Define settings interface (e.g., `MyPluginSettings`)
+- Create `DEFAULT_SETTINGS` constant
+- Use `this.loadData()` and `this.saveData()` for persistence
+- Implement settings tab extending `PluginSettingTab`
+
+### Event Registration
+- Use `this.registerEvent()` for app events
+- Use `this.registerDomEvent()` for DOM events
+- Use `this.registerInterval()` for intervals
+- All registered events are automatically cleaned up on unload
+
+### Code Organization
+- Keep `main.ts` focused on plugin lifecycle
+- Split functionality into separate classes/modules
+- Use TypeScript interfaces for type safety
+- Follow Obsidian's naming conventions

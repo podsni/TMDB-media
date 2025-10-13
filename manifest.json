@@ -1,0 +1,11 @@
+{
+	"id": "tmdb-obsidian-plugin",
+	"name": "TMDB Obsidian Plugin",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Integrate The Movie Database (TMDB) API with Obsidian for movie and TV show information.",
+	"author": "Hadesmindxx",
+	"authorUrl": "https://github.com/hadesmindxx",
+	"fundingUrl": "https://github.com/sponsors/hadesmindxx",
+	"isDesktopOnly": false
+}

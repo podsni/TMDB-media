@@ -1,0 +1,46 @@
+---
+description: Security, privacy, and performance considerations for Obsidian plugins
+---
+
+# Security and Performance Guidelines
+
+## Security Best Practices
+- **No remote code execution** - Never fetch and execute remote scripts
+- **Minimal file access** - Only access files within the vault
+- **No hidden telemetry** - Disclose any data collection clearly
+- **Explicit user consent** - Require opt-in for external services
+- **Secure data handling** - Don't store sensitive data in plain text
+
+## Privacy Considerations
+- **Local-first approach** - Default to offline operation
+- **Minimal data collection** - Only collect what's necessary
+- **Clear disclosure** - Document any external services used
+- **User control** - Allow users to disable features that use external services
+- **No vault content transmission** - Don't send vault contents to external services
+
+## Performance Guidelines
+- **Lazy initialization** - Defer heavy work until needed
+- **Efficient file operations** - Batch file system operations
+- **Memory management** - Clean up large objects and listeners
+- **Debounced operations** - Use debouncing for expensive operations
+- **Minimal startup impact** - Keep `onload()` lightweight
+
+## Error Handling
+- Use try/catch blocks for async operations
+- Provide user-friendly error messages with `Notice`
+- Log errors to console for debugging
+- Gracefully handle missing files or permissions
+- Don't crash the plugin on non-critical errors
+
+## Resource Management
+- Register all event listeners with `this.register*()` methods
+- Clean up intervals and timeouts
+- Remove DOM event listeners in `onunload()`
+- Dispose of large objects when no longer needed
+- Use weak references where appropriate
+
+## Mobile Compatibility
+- Test on mobile devices when possible
+- Avoid desktop-only APIs unless necessary
+- Set `isDesktopOnly: false` in [manifest.json](mdc:manifest.json) for mobile support
+- Consider touch interactions in UI design
