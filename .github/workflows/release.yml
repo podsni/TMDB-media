@@ -60,6 +60,24 @@ jobs:
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "clean_tag=${CLEAN_TAG}" >> $GITHUB_OUTPUT
 
+      - name: Read manifest metadata
+        id: manifest
+        run: |
+          PLUGIN_ID=$(jq -r '.id' manifest.json)
+          echo "plugin_id=${PLUGIN_ID}" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP bundle
+        id: zip
+        run: |
+          NAME="${{ steps.manifest.outputs.plugin_id }}-${{ steps.ver.outputs.clean_tag }}.zip"
+          # -j to junk paths so files are at root of the zip
+          if [ -f styles.css ]; then
+            zip -j "$NAME" manifest.json main.js styles.css
+          else
+            zip -j "$NAME" manifest.json main.js
+          fi
+          echo "zip_name=$NAME" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -71,5 +89,6 @@ jobs:
             manifest.json
             main.js
             styles.css
+            ${{ steps.zip.outputs.zip_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
