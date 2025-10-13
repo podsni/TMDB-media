@@ -1,14 +1,14 @@
 {
-	"name": "tmdb-obsidian-plugin",
+	"name": "tmdb-media",
 	"version": "1.0.0",
-	"description": "Integrate The Movie Database (TMDB) API with Obsidian for movie and TV show information.",
+	"description": "Integrates TMDB to add movie and series info with YAML notes.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": ["obsidian", "plugin", "tmdb", "movie", "tv", "database"],
+	"keywords": ["tmdb", "movie", "series", "yaml", "media"],
 	"author": "Hadesmindxx",
 	"license": "MIT",
 	"devDependencies": {
