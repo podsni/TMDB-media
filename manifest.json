@@ -5,7 +5,7 @@
 	"minAppVersion": "0.15.0",
 	"description": "Integrates TMDB to add movie and series info with YAML notes.",
 	"author": "Hadesmindxx",
-	"authorUrl": "https://github.com/hadesmindxx",
-	"fundingUrl": "https://github.com/sponsors/hadesmindxx",
+	"authorUrl": "https://github.com/dwirx",
+	"fundingUrl": "https://github.com/sponsors/dwirx",
 	"isDesktopOnly": false
 }
