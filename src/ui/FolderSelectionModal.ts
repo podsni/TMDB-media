@@ -22,17 +22,24 @@ export class FolderSelectionModal extends Modal {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
 
+		this.modalEl.classList.add('tmdb-modal', 'tmdb-modal--folder');
+		contentEl.classList.add('tmdb-modal-content', 'tmdb-modal-content--folder');
+
 		// Header
-		const header = document.createElement('div');
-		header.className = 'tmdb-folder-header';
+		const headerSection = document.createElement('div');
+		headerSection.className = 'tmdb-modal-section tmdb-modal-header tmdb-folder-header';
 		
 		const title = document.createElement('h2');
+		title.className = 'tmdb-modal-title';
 		const contentTypeText = this.getContentTypeText();
 		title.textContent = `Select Save Location for ${contentTypeText}`;
-		header.appendChild(title);
-		contentEl.appendChild(header);
+		headerSection.appendChild(title);
+		contentEl.appendChild(headerSection);
 
 		// Folder input
+		const inputSection = document.createElement('div');
+		inputSection.className = 'tmdb-modal-section tmdb-folder-section';
+
 		const inputContainer = document.createElement('div');
 		inputContainer.className = 'tmdb-folder-input-container';
 		
@@ -50,7 +57,7 @@ export class FolderSelectionModal extends Modal {
 		folderInput.className = 'tmdb-folder-input';
 		inputContainer.appendChild(folderInput);
 
-		contentEl.appendChild(inputContainer);
+		inputSection.appendChild(inputContainer);
 
 		// Quick folder buttons (prefix with current base)
 		const quickFolders = document.createElement('div');
@@ -78,9 +85,13 @@ export class FolderSelectionModal extends Modal {
 		});
 
 		quickFolders.appendChild(quickButtonsContainer);
-		contentEl.appendChild(quickFolders);
+		inputSection.appendChild(quickFolders);
+		contentEl.appendChild(inputSection);
 
 		// Action buttons
+		const actionsSection = document.createElement('div');
+		actionsSection.className = 'tmdb-modal-section tmdb-actions-section';
+
 		const buttonContainer = document.createElement('div');
 		buttonContainer.className = 'tmdb-folder-buttons';
 		
@@ -96,7 +107,8 @@ export class FolderSelectionModal extends Modal {
 		cancelButton.className = 'tmdb-close-button';
 		buttonContainer.appendChild(cancelButton);
 
-		contentEl.appendChild(buttonContainer);
+		actionsSection.appendChild(buttonContainer);
+		contentEl.appendChild(actionsSection);
 
 		// Event listeners
 		saveButton.addEventListener('click', () => {
@@ -199,5 +211,7 @@ export class FolderSelectionModal extends Modal {
 	onClose() {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
+		contentEl.classList.remove('tmdb-modal-content', 'tmdb-modal-content--folder');
+		this.modalEl.classList.remove('tmdb-modal', 'tmdb-modal--folder');
 	}
 }

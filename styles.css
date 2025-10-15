@@ -4,40 +4,127 @@
 	color: #ffd700;
 }
 
+/* Modal Layout */
+.tmdb-modal {
+	width: min(90vw, 720px);
+}
+
+.tmdb-modal--preview {
+	width: min(95vw, 840px);
+}
+
+.tmdb-modal--folder {
+	width: min(90vw, 520px);
+}
+
+.tmdb-modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: 1.5rem;
+	width: 100%;
+	box-sizing: border-box;
+	max-height: min(80vh, 680px);
+	overflow-y: auto;
+}
+
+.tmdb-modal-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	width: 100%;
+}
+
+.tmdb-modal-header {
+	gap: 1rem;
+}
+
+.tmdb-modal-title {
+	margin: 0;
+	font-size: 1.5rem;
+	line-height: 1.2;
+	color: var(--text-normal);
+}
+
+.tmdb-modal-section:last-child {
+	margin-bottom: 0;
+}
+
+.tmdb-actions-section {
+	align-items: center;
+}
+
+@media (max-width: 768px) {
+	.tmdb-modal {
+		width: 94vw;
+	}
+
+	.tmdb-modal--preview {
+		width: 96vw;
+	}
+
+	.tmdb-modal--folder {
+		width: 94vw;
+	}
+
+	.tmdb-modal-content {
+		padding: 1.25rem 1rem;
+		max-height: 85vh;
+	}
+}
+
 .tmdb-search-container {
-	margin-bottom: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
 }
 
 .tmdb-search-input {
-	width: 70%;
-	padding: 8px;
-	margin-right: 10px;
+	flex: 1 1 220px;
+	min-width: 0;
+	padding: 10px;
 	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
+	border-radius: 6px;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 }
 
 .tmdb-search-button {
-	padding: 8px 16px;
+	flex: 0 0 auto;
+	padding: 10px 18px;
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border: none;
-	border-radius: 4px;
+	border-radius: 6px;
 	cursor: pointer;
+	font-weight: 600;
+	transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .tmdb-search-button:hover {
 	background-color: var(--interactive-accent-hover);
+	transform: translateY(-1px);
+}
+
+.tmdb-search-hint {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.85em;
 }
 
 .tmdb-results-container {
-	max-height: 400px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-height: 45vh;
 	overflow-y: auto;
+	padding-right: 4px;
 }
 
 .tmdb-result-item {
 	display: flex;
+	gap: 15px;
 	margin-bottom: 15px;
 	padding: 10px;
 	border: 1px solid var(--background-modifier-border);
@@ -55,6 +142,9 @@
 
 .tmdb-result-content {
 	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
 
 .tmdb-result-content h4 {
@@ -68,29 +158,62 @@
 	font-size: 0.9em;
 }
 
+.tmdb-results-title {
+	margin: 0;
+	font-size: 1.2em;
+	color: var(--text-normal);
+}
+
+.tmdb-results-empty {
+	margin: 0;
+	color: var(--text-muted);
+}
+
+.tmdb-result-title {
+	margin: 0;
+	color: var(--text-normal);
+}
+
+.tmdb-result-overview {
+	color: var(--text-muted);
+	font-size: 0.92em;
+}
+
+.tmdb-result-rating {
+	color: var(--text-normal);
+	font-weight: 500;
+	font-size: 0.9em;
+}
+
 .tmdb-button-container {
 	display: flex;
 	gap: 8px;
 	margin-top: 8px;
 	flex-wrap: wrap;
+	width: 100%;
+	justify-content: flex-start;
 }
 
 .tmdb-insert-button,
 .tmdb-save-button,
 .tmdb-preview-button {
-	padding: 6px 12px;
+	flex: 1 1 160px;
+	padding: 10px 14px;
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
 	font-size: 0.9em;
+	font-weight: 600;
+	transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .tmdb-insert-button:hover,
 .tmdb-save-button:hover,
 .tmdb-preview-button:hover {
 	background-color: var(--interactive-accent-hover);
+	transform: translateY(-1px);
 }
 
 .tmdb-save-button {
@@ -107,6 +230,18 @@
 
 .tmdb-preview-button:hover {
 	background-color: var(--text-normal);
+}
+
+.tmdb-insert-button:focus-visible,
+.tmdb-save-button:focus-visible,
+.tmdb-preview-button:focus-visible,
+.tmdb-search-button:focus-visible,
+.provider-select-all-btn:focus-visible,
+.provider-select-none-btn:focus-visible,
+.tmdb-quick-folder-btn:focus-visible,
+.tmdb-close-button:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
 }
 
 .tmdb-help-container {
@@ -144,7 +279,7 @@
 }
 
 .tmdb-preview-container {
-	max-height: 500px;
+	max-height: 55vh;
 	overflow-y: auto;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 8px;
@@ -234,6 +369,15 @@
 	gap: 10px;
 	justify-content: center;
 	flex-wrap: wrap;
+	width: 100%;
+}
+
+.tmdb-preview-buttons .tmdb-insert-button,
+.tmdb-preview-buttons .tmdb-save-button,
+.tmdb-preview-buttons .tmdb-close-button {
+	flex: 1 1 160px;
+	padding: 10px 14px;
+	font-weight: 600;
 }
 
 /* Folder Selection Modal Styles */
@@ -282,17 +426,20 @@
 }
 
 .tmdb-quick-folder-btn {
-	padding: 6px 12px;
+	padding: 8px 14px;
 	background-color: var(--background-secondary);
 	color: var(--text-normal);
 	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
+	border-radius: 6px;
 	cursor: pointer;
 	font-size: 0.9em;
+	font-weight: 500;
+	transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .tmdb-quick-folder-btn:hover {
 	background-color: var(--background-modifier-border);
+	transform: translateY(-1px);
 }
 
 .tmdb-folder-buttons {
@@ -303,16 +450,19 @@
 }
 
 .tmdb-close-button {
-	padding: 8px 16px;
+	padding: 10px 16px;
 	background-color: var(--background-modifier-border);
 	color: var(--text-normal);
 	border: none;
-	border-radius: 4px;
+	border-radius: 6px;
 	cursor: pointer;
+	font-weight: 600;
+	transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .tmdb-close-button:hover {
 	background-color: var(--background-modifier-border-hover);
+	transform: translateY(-1px);
 }
 
 /* Settings textarea styling */
@@ -521,7 +671,15 @@
 	}
 	
 	.provider-selection-controls {
-		justify-content: center;
+		flex-wrap: wrap;
+		justify-content: stretch;
+		width: 100%;
+	}
+
+	.provider-select-all-btn,
+	.provider-select-none-btn {
+		flex: 1 1 140px;
+		text-align: center;
 	}
 	
 	.provider-selection-grid {
@@ -583,12 +741,45 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
+	.tmdb-search-container {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.tmdb-search-button {
+		width: 100%;
+	}
+
+	.tmdb-search-input {
+		width: 100%;
+	}
+
+	.tmdb-results-container {
+		max-height: 55vh;
+	}
+
+	.tmdb-preview-container {
+		max-height: 45vh;
+	}
+
 	.tmdb-button-container {
 		flex-direction: column;
+	}
+
+	.tmdb-button-container .tmdb-insert-button,
+	.tmdb-button-container .tmdb-save-button,
+	.tmdb-button-container .tmdb-preview-button {
+		flex-basis: 100%;
 	}
 	
 	.tmdb-preview-buttons {
 		flex-direction: column;
+	}
+
+	.tmdb-preview-buttons .tmdb-insert-button,
+	.tmdb-preview-buttons .tmdb-save-button,
+	.tmdb-preview-buttons .tmdb-close-button {
+		flex-basis: 100%;
 	}
 	
 	.tmdb-result-item {

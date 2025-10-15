@@ -31,31 +31,42 @@ export class MediaPreviewModal extends Modal {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
 
+		this.modalEl.classList.add('tmdb-modal', 'tmdb-modal--preview');
+		contentEl.classList.add('tmdb-modal-content', 'tmdb-modal-content--preview');
+
 		// Header
-		const header = document.createElement('div');
-		header.className = 'tmdb-preview-header';
+		const headerSection = document.createElement('div');
+		headerSection.className = 'tmdb-modal-section tmdb-modal-header tmdb-preview-header';
 		
 		const title = document.createElement('h2');
+		title.className = 'tmdb-modal-title';
 		const itemTitle = this.getItemTitle();
 		const itemYear = this.getItemYear();
-		title.textContent = `Preview: ${itemTitle} (${itemYear})`;
-		header.appendChild(title);
-		contentEl.appendChild(header);
+		title.textContent = itemYear !== 'N/A' ? `Preview: ${itemTitle} (${itemYear})` : `Preview: ${itemTitle}`;
+		headerSection.appendChild(title);
 
 		// Provider indicator
 		const providerIndicator = this.buildProviderIndicator();
-		contentEl.appendChild(providerIndicator);
+		headerSection.appendChild(providerIndicator);
+		contentEl.appendChild(headerSection);
 
 		// Preview content
+		const previewSection = document.createElement('div');
+		previewSection.className = 'tmdb-modal-section tmdb-preview-section';
+
 		const previewContainer = document.createElement('div');
 		previewContainer.className = 'tmdb-preview-container';
 		
 		// Create syntax highlighted YAML
 		const highlightedYamlEl = this.highlightYAML(this.data);
 		previewContainer.appendChild(highlightedYamlEl);
-		contentEl.appendChild(previewContainer);
+		previewSection.appendChild(previewContainer);
+		contentEl.appendChild(previewSection);
 
 		// Action buttons
+		const actionsSection = document.createElement('div');
+		actionsSection.className = 'tmdb-modal-section tmdb-actions-section';
+
 		const buttonContainer = document.createElement('div');
 		buttonContainer.className = 'tmdb-preview-buttons';
 		
@@ -77,7 +88,8 @@ export class MediaPreviewModal extends Modal {
 		closeButton.className = 'tmdb-close-button';
 		buttonContainer.appendChild(closeButton);
 
-		contentEl.appendChild(buttonContainer);
+		actionsSection.appendChild(buttonContainer);
+		contentEl.appendChild(actionsSection);
 
 		// Event listeners
 		insertButton.addEventListener('click', () => {
@@ -192,6 +204,8 @@ export class MediaPreviewModal extends Modal {
 	onClose() {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
+		contentEl.classList.remove('tmdb-modal-content', 'tmdb-modal-content--preview');
+		this.modalEl.classList.remove('tmdb-modal', 'tmdb-modal--preview');
 	}
 
 	// Highlight YAML syntax

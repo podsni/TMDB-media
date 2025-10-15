@@ -34,22 +34,36 @@ export class MediaSearchModal extends Modal {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
 
+		this.modalEl.classList.add('tmdb-modal', 'tmdb-modal--search');
+		contentEl.classList.add('tmdb-modal-content', 'tmdb-modal-content--search');
+
+		const headerSection = document.createElement('div');
+		headerSection.className = 'tmdb-modal-section tmdb-modal-header';
+
 		const h2 = document.createElement('h2');
+		h2.className = 'tmdb-modal-title';
 		h2.textContent = this.getModalTitle();
-		contentEl.appendChild(h2);
+		headerSection.appendChild(h2);
 
 		// Provider indicator
 		const providerIndicator = this.buildProviderIndicator();
-		contentEl.appendChild(providerIndicator);
+		headerSection.appendChild(providerIndicator);
+		contentEl.appendChild(headerSection);
 
 		// Provider selection
 		const providerSelection = this.buildProviderSelection();
-		contentEl.appendChild(providerSelection);
+		const providerSection = document.createElement('div');
+		providerSection.className = 'tmdb-modal-section tmdb-provider-section';
+		providerSection.appendChild(providerSelection);
+		contentEl.appendChild(providerSection);
 
 		// Search input
+		const searchSection = document.createElement('div');
+		searchSection.className = 'tmdb-modal-section tmdb-search-section';
+
 		const searchContainer = document.createElement('div');
 		searchContainer.className = 'tmdb-search-container';
-		contentEl.appendChild(searchContainer);
+		searchSection.appendChild(searchContainer);
 		
 		const searchInput = document.createElement('input');
 		searchInput.type = 'text';
@@ -58,14 +72,24 @@ export class MediaSearchModal extends Modal {
 		searchContainer.appendChild(searchInput);
 
 		const searchButton = document.createElement('button');
+		searchButton.type = 'button';
 		searchButton.textContent = 'Search';
 		searchButton.className = 'tmdb-search-button';
 		searchContainer.appendChild(searchButton);
 
+		const searchHint = document.createElement('p');
+		searchHint.className = 'tmdb-search-hint';
+		searchHint.textContent = 'Tap Search or press Enter to run the query.';
+		searchSection.appendChild(searchHint);
+		contentEl.appendChild(searchSection);
+
 		// Results container
+		const resultsSection = document.createElement('div');
+		resultsSection.className = 'tmdb-modal-section tmdb-results-section';
 		const resultsContainer = document.createElement('div');
 		resultsContainer.className = 'tmdb-results-container';
-		contentEl.appendChild(resultsContainer);
+		resultsSection.appendChild(resultsContainer);
+		contentEl.appendChild(resultsSection);
 
 		// Search functionality
 		const performSearch = async () => {
@@ -397,21 +421,23 @@ export class MediaSearchModal extends Modal {
 		return selected;
 	}
 
-		displayResults(container: HTMLElement) {
-			while (container.firstChild) container.removeChild(container.firstChild);
+	private displayResults(container: HTMLElement) {
+		while (container.firstChild) container.removeChild(container.firstChild);
 
 		if (this.searchResults.length === 0) {
 			const p = document.createElement('p');
+			p.className = 'tmdb-results-empty';
 			p.textContent = 'No results found.';
 			container.appendChild(p);
 			return;
 		}
 
 		const h3 = document.createElement('h3');
+		h3.className = 'tmdb-results-title';
 		h3.textContent = 'Search Results';
 		container.appendChild(h3);
 
-		this.searchResults.forEach((item, index) => {
+		this.searchResults.forEach(item => {
 			const resultItem = document.createElement('div');
 			resultItem.className = 'tmdb-result-item';
 			container.appendChild(resultItem);
@@ -422,6 +448,7 @@ export class MediaSearchModal extends Modal {
 				const img = document.createElement('img');
 				img.src = posterPath;
 				img.className = 'tmdb-poster';
+				img.alt = `${this.getTitle(item)} poster`;
 				resultItem.appendChild(img);
 			}
 
@@ -434,7 +461,8 @@ export class MediaSearchModal extends Modal {
 			const year = this.getYear(item);
 			
 			const h4 = document.createElement('h4');
-			h4.textContent = `${title} (${year})`;
+			h4.className = 'tmdb-result-title';
+			h4.textContent = year !== 'N/A' ? `${title} (${year})` : title;
 			content.appendChild(h4);
 
 			// Provider indicator for each result
@@ -442,10 +470,12 @@ export class MediaSearchModal extends Modal {
 			content.appendChild(providerIndicator);
 			
 			const overviewP = document.createElement('p');
+			overviewP.className = 'tmdb-result-overview';
 			overviewP.textContent = this.getOverview(item);
 			content.appendChild(overviewP);
 			
 			const ratingP = document.createElement('p');
+			ratingP.className = 'tmdb-result-rating';
 			ratingP.textContent = this.getRatingText(item);
 			content.appendChild(ratingP);
 
@@ -607,5 +637,7 @@ export class MediaSearchModal extends Modal {
 	onClose() {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
+		contentEl.classList.remove('tmdb-modal-content', 'tmdb-modal-content--search');
+		this.modalEl.classList.remove('tmdb-modal', 'tmdb-modal--search');
 	}
 }
