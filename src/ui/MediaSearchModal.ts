@@ -54,7 +54,31 @@ export class MediaSearchModal extends Modal {
 		const providerSelection = this.buildProviderSelection();
 		const providerSection = document.createElement('div');
 		providerSection.className = 'tmdb-modal-section tmdb-provider-section';
-		providerSection.appendChild(providerSelection);
+
+		const providerToggleBar = document.createElement('div');
+		providerToggleBar.className = 'tmdb-provider-toggle';
+
+		const providerToggleLabel = document.createElement('span');
+		providerToggleLabel.className = 'tmdb-provider-toggle__label';
+		providerToggleLabel.textContent = 'Providers';
+		providerToggleBar.appendChild(providerToggleLabel);
+
+		const providerToggleBtn = document.createElement('button');
+		providerToggleBtn.type = 'button';
+		providerToggleBtn.className = 'tmdb-provider-toggle__button';
+		providerToggleBtn.textContent = 'Hide providers';
+		providerToggleBtn.setAttribute('aria-expanded', 'true');
+		providerToggleBar.appendChild(providerToggleBtn);
+
+		const providerContent = document.createElement('div');
+		providerContent.className = 'tmdb-provider-content';
+		const providerContentId = `tmdb-provider-content-${Date.now()}`;
+		providerContent.id = providerContentId;
+		providerToggleBtn.setAttribute('aria-controls', providerContentId);
+		providerContent.appendChild(providerSelection);
+
+		providerSection.appendChild(providerToggleBar);
+		providerSection.appendChild(providerContent);
 		contentEl.appendChild(providerSection);
 
 		// Search input
@@ -147,6 +171,26 @@ export class MediaSearchModal extends Modal {
 			if (e.key === 'Enter') {
 				performSearch();
 			}
+		});
+
+		// Provider toggle behaviour
+		let providersCollapsed = false;
+		const setProvidersCollapsed = (collapsed: boolean) => {
+			providersCollapsed = collapsed;
+			providerContent.classList.toggle('is-hidden', collapsed);
+			providerSection.classList.toggle('is-collapsed', collapsed);
+			providerContent.setAttribute('aria-hidden', collapsed ? 'true' : 'false');
+			providerToggleBtn.textContent = collapsed ? 'Show providers' : 'Hide providers';
+			providerToggleBtn.setAttribute('aria-expanded', (!collapsed).toString());
+		};
+
+		const defaultCollapsed = typeof window !== 'undefined' && window.innerWidth < 700;
+		if (defaultCollapsed) {
+			setProvidersCollapsed(true);
+		}
+
+		providerToggleBtn.addEventListener('click', () => {
+			setProvidersCollapsed(!providersCollapsed);
 		});
 
 		// Add provider selection event listeners
