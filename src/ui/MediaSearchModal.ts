@@ -12,6 +12,7 @@ export class MediaSearchModal extends Modal {
 	private fileManager: FileManager;
 	private settings: TMDBPluginSettings;
 	private searchType: SearchType;
+	private readonly isMobile: boolean;
 	private searchResults: MediaItem[] = [];
 
 	constructor(
@@ -28,6 +29,7 @@ export class MediaSearchModal extends Modal {
 		this.fileManager = fileManager;
 		this.settings = settings;
 		this.searchType = searchType;
+		this.isMobile = Boolean((app as unknown as { isMobile?: boolean }).isMobile);
 	}
 
 	onOpen() {
@@ -36,6 +38,10 @@ export class MediaSearchModal extends Modal {
 
 		this.modalEl.classList.add('tmdb-modal', 'tmdb-modal--search');
 		contentEl.classList.add('tmdb-modal-content', 'tmdb-modal-content--search');
+		if (this.isMobile) {
+			this.modalEl.classList.add('tmdb-modal--mobile');
+			contentEl.classList.add('tmdb-modal-content--mobile');
+		}
 
 		const headerSection = document.createElement('div');
 		headerSection.className = 'tmdb-modal-section tmdb-modal-header';
@@ -47,7 +53,11 @@ export class MediaSearchModal extends Modal {
 
 		// Provider indicator
 		const providerIndicator = this.buildProviderIndicator();
-		headerSection.appendChild(providerIndicator);
+		if (this.isMobile) {
+			providerIndicator.classList.add('tmdb-provider-indicator--inline');
+		} else {
+			headerSection.appendChild(providerIndicator);
+		}
 		contentEl.appendChild(headerSection);
 
 		// Provider selection
@@ -78,6 +88,9 @@ export class MediaSearchModal extends Modal {
 		providerContent.appendChild(providerSelection);
 
 		providerSection.appendChild(providerToggleBar);
+		if (this.isMobile) {
+			providerSection.appendChild(providerIndicator);
+		}
 		providerSection.appendChild(providerContent);
 		contentEl.appendChild(providerSection);
 
@@ -184,7 +197,7 @@ export class MediaSearchModal extends Modal {
 			providerToggleBtn.setAttribute('aria-expanded', (!collapsed).toString());
 		};
 
-		const defaultCollapsed = typeof window !== 'undefined' && window.innerWidth < 700;
+		const defaultCollapsed = this.isMobile || (typeof window !== 'undefined' && window.innerWidth < 700);
 		if (defaultCollapsed) {
 			setProvidersCollapsed(true);
 		}
@@ -682,6 +695,8 @@ export class MediaSearchModal extends Modal {
 		const { contentEl } = this;
 		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
 		contentEl.classList.remove('tmdb-modal-content', 'tmdb-modal-content--search');
+		contentEl.classList.remove('tmdb-modal-content--mobile');
 		this.modalEl.classList.remove('tmdb-modal', 'tmdb-modal--search');
+		this.modalEl.classList.remove('tmdb-modal--mobile');
 	}
 }
