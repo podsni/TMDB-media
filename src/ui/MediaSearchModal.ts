@@ -246,6 +246,7 @@ export class MediaSearchModal extends Modal {
 		if (this.searchType === 'movie' || this.searchType === 'tv' || this.searchType === 'both') {
 			providers.push({
 				name: 'TMDB',
+				icon: '🎬',
 				status: this.settings.apiKey ? 'active' : 'inactive',
 				description: 'The Movie Database'
 			});
@@ -256,56 +257,77 @@ export class MediaSearchModal extends Modal {
 			const animeConfig = this.getAnimeProviderConfig(animeProvider);
 			providers.push({
 				name: animeConfig.name,
+				icon: animeConfig.icon,
 				status: animeConfig.enabled ? 'active' : 'inactive',
 				description: animeConfig.description || 'Anime Database'
 			});
 		}
 		
 		for (const provider of providers) {
-			const item = document.createElement('div');
-			item.className = `provider-item ${provider.status}`;
+			const chip = document.createElement('span');
+			chip.className = `tmdb-provider-chip ${provider.status}`;
+			chip.title = provider.description;
+			chip.setAttribute(
+				'aria-label',
+				`${provider.name} ${provider.status === 'active' ? 'ready' : 'needs setup'}`
+			);
+
+			if (provider.icon) {
+				const icon = document.createElement('span');
+				icon.className = 'tmdb-provider-chip__icon';
+				icon.textContent = provider.icon;
+				chip.appendChild(icon);
+			}
+
 			const name = document.createElement('span');
-			name.className = 'provider-name';
+			name.className = 'tmdb-provider-chip__name';
 			name.textContent = provider.name;
+			chip.appendChild(name);
+
 			const status = document.createElement('span');
-			status.className = 'provider-status';
-			status.textContent = provider.status === 'active' ? '✓' : '✗';
-			const desc = document.createElement('span');
-			desc.className = 'provider-description';
-			desc.textContent = provider.description;
-			item.appendChild(name);
-			item.appendChild(status);
-			item.appendChild(desc);
-			container.appendChild(item);
+			status.className = 'tmdb-provider-chip__status';
+			status.textContent = provider.status === 'active' ? '✓' : '!';
+			chip.appendChild(status);
+
+			const description = document.createElement('span');
+			description.className = 'tmdb-visually-hidden';
+			description.textContent = provider.description;
+			chip.appendChild(description);
+
+			container.appendChild(chip);
 		}
 		return container;
 	}
 
-	private getAnimeProviderConfig(provider: string): { name: string; enabled: boolean; description: string } {
+	private getAnimeProviderConfig(provider: string): { name: string; enabled: boolean; description: string; icon: string } {
 		switch (provider) {
 			case 'jikan':
 				return {
 					name: 'Jikan',
 					enabled: this.settings.jikanConfig.enabled,
-					description: 'MyAnimeList API'
+					description: 'MyAnimeList API',
+					icon: '🎌'
 				};
 			case 'anilist':
 				return {
 					name: 'AniList',
 					enabled: this.settings.anilistConfig.enabled,
-					description: 'AniList GraphQL API'
+					description: 'AniList GraphQL API',
+					icon: '📊'
 				};
 			case 'kitsu':
 				return {
 					name: 'Kitsu',
 					enabled: this.settings.kitsuConfig.enabled,
-					description: 'Kitsu API'
+					description: 'Kitsu API',
+					icon: '🎭'
 				};
 			default:
 				return {
 					name: 'Unknown',
 					enabled: false,
-					description: 'Unknown Provider'
+					description: 'Unknown Provider',
+					icon: '❔'
 				};
 		}
 	}
@@ -640,29 +662,37 @@ export class MediaSearchModal extends Modal {
 		if ('mal_id' in item) {
 			const animeProvider = this.settings.animeProvider;
 			const animeConfig = this.getAnimeProviderConfig(animeProvider);
-			const badge = document.createElement('div');
-			badge.className = 'provider-badge anime';
+			const chip = document.createElement('span');
+			chip.className = 'tmdb-provider-chip tmdb-provider-chip--result anime';
+			chip.title = animeConfig.description;
+
 			const icon = document.createElement('span');
-			icon.className = 'provider-icon';
-			icon.textContent = '🎌';
+			icon.className = 'tmdb-provider-chip__icon';
+			icon.textContent = animeConfig.icon;
+			chip.appendChild(icon);
+
 			const name = document.createElement('span');
-			name.className = 'provider-name';
+			name.className = 'tmdb-provider-chip__name';
 			name.textContent = animeConfig.name;
-			badge.appendChild(icon);
-			badge.appendChild(name);
-			container.appendChild(badge);
+			chip.appendChild(name);
+
+			container.appendChild(chip);
 		} else {
-			const badge = document.createElement('div');
-			badge.className = 'provider-badge tmdb';
+			const chip = document.createElement('span');
+			chip.className = 'tmdb-provider-chip tmdb-provider-chip--result tmdb';
+			chip.title = 'The Movie Database';
+
 			const icon = document.createElement('span');
-			icon.className = 'provider-icon';
+			icon.className = 'tmdb-provider-chip__icon';
 			icon.textContent = '🎬';
+			chip.appendChild(icon);
+
 			const name = document.createElement('span');
-			name.className = 'provider-name';
+			name.className = 'tmdb-provider-chip__name';
 			name.textContent = 'TMDB';
-			badge.appendChild(icon);
-			badge.appendChild(name);
-			container.appendChild(badge);
+			chip.appendChild(name);
+
+			container.appendChild(chip);
 		}
 		return container;
 	}
