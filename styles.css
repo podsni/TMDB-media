@@ -44,6 +44,8 @@
 .tmdb-modal-content--mobile {
 	max-height: none;
 	height: 100%;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .tmdb-modal-section {
@@ -149,7 +151,10 @@
 	cursor: pointer;
 	font-size: 0.85em;
 	font-weight: 600;
-	transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease,
+		transform 0.15s ease;
 }
 
 .tmdb-provider-toggle__button:hover {
@@ -186,7 +191,9 @@
 	border-radius: 6px;
 	cursor: pointer;
 	font-weight: 600;
-	transition: transform 0.15s ease, background-color 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 }
 
 .tmdb-search-button:hover {
@@ -222,6 +229,7 @@
 	min-height: 0;
 	overflow-y: auto;
 	padding-right: 4px;
+	-webkit-overflow-scrolling: touch;
 }
 
 .tmdb-results-title {
@@ -320,7 +328,9 @@
 	cursor: pointer;
 	font-size: 0.9em;
 	font-weight: 600;
-	transition: transform 0.15s ease, background-color 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 }
 
 .tmdb-insert-button:hover,
@@ -548,7 +558,9 @@
 	cursor: pointer;
 	font-size: 0.9em;
 	font-weight: 500;
-	transition: transform 0.15s ease, background-color 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 }
 
 .tmdb-quick-folder-btn:hover {
@@ -571,7 +583,9 @@
 	border-radius: 6px;
 	cursor: pointer;
 	font-weight: 600;
-	transition: transform 0.15s ease, background-color 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		background-color 0.15s ease;
 }
 
 .tmdb-close-button:hover {
@@ -829,7 +843,7 @@
 		flex-direction: column;
 		align-items: stretch;
 	}
-	
+
 	.provider-selection-controls {
 		flex-wrap: wrap;
 		justify-content: stretch;
@@ -841,11 +855,11 @@
 		flex: 1 1 140px;
 		text-align: center;
 	}
-	
+
 	.provider-selection-grid {
 		grid-template-columns: 1fr;
 	}
-	
+
 	.provider-checkbox-text .provider-description {
 		display: none;
 	}
@@ -927,7 +941,7 @@
 	.tmdb-button-container .tmdb-preview-button {
 		flex-basis: 100%;
 	}
-	
+
 	.tmdb-preview-buttons {
 		flex-direction: column;
 	}
@@ -937,11 +951,11 @@
 	.tmdb-preview-buttons .tmdb-close-button {
 		flex-basis: 100%;
 	}
-	
+
 	.tmdb-result-item {
 		flex-direction: column;
 	}
-	
+
 	.tmdb-poster {
 		width: 100%;
 		height: auto;
@@ -949,13 +963,14 @@
 		margin-right: 0;
 		margin-bottom: 10px;
 	}
-	
+
 	.tmdb-provider-indicator {
 		flex-direction: column;
 		align-items: stretch;
 	}
 
 	.tmdb-search-section {
+		position: static;
 		top: 0;
 		box-shadow: none;
 		padding-bottom: 0.5rem;
@@ -963,6 +978,17 @@
 
 	.provider-item {
 		justify-content: center;
+	}
+
+	.tmdb-results-section {
+		flex: none;
+		min-height: auto;
+	}
+
+	.tmdb-results-container {
+		max-height: none;
+		overflow-y: visible;
+		padding-right: 0;
 	}
 }
 

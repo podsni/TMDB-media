@@ -1,10 +1,16 @@
-import { App, Modal, Notice } from 'obsidian';
-import { MediaItem, TMDBMovie, TMDBTVShow, JikanAnime, SearchType } from '../types';
-import { MediaService } from '../services/MediaService';
-import { TemplateFormatter } from '../utils/TemplateFormatter';
-import { FileManager } from '../utils/FileManager';
-import { TMDBPluginSettings } from '../types/settings';
-import { MediaPreviewModal } from './MediaPreviewModal';
+import { App, Modal, Notice } from "obsidian";
+import {
+	MediaItem,
+	TMDBMovie,
+	TMDBTVShow,
+	JikanAnime,
+	SearchType,
+} from "../types";
+import { MediaService } from "../services/MediaService";
+import { TemplateFormatter } from "../utils/TemplateFormatter";
+import { FileManager } from "../utils/FileManager";
+import { TMDBPluginSettings } from "../types/settings";
+import { MediaPreviewModal } from "./MediaPreviewModal";
 
 export class MediaSearchModal extends Modal {
 	private mediaService: MediaService;
@@ -16,12 +22,12 @@ export class MediaSearchModal extends Modal {
 	private searchResults: MediaItem[] = [];
 
 	constructor(
-		app: App, 
-		mediaService: MediaService, 
+		app: App,
+		mediaService: MediaService,
 		templateFormatter: TemplateFormatter,
 		fileManager: FileManager,
 		settings: TMDBPluginSettings,
-		searchType: SearchType = 'both'
+		searchType: SearchType = "both",
 	) {
 		super(app);
 		this.mediaService = mediaService;
@@ -29,32 +35,38 @@ export class MediaSearchModal extends Modal {
 		this.fileManager = fileManager;
 		this.settings = settings;
 		this.searchType = searchType;
-		this.isMobile = Boolean((app as unknown as { isMobile?: boolean }).isMobile);
+		this.isMobile = Boolean(
+			(app as unknown as { isMobile?: boolean }).isMobile,
+		);
 	}
 
 	onOpen() {
 		const { contentEl } = this;
-		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
+		while (contentEl.firstChild)
+			contentEl.removeChild(contentEl.firstChild);
 
-		this.modalEl.classList.add('tmdb-modal', 'tmdb-modal--search');
-		contentEl.classList.add('tmdb-modal-content', 'tmdb-modal-content--search');
+		this.modalEl.classList.add("tmdb-modal", "tmdb-modal--search");
+		contentEl.classList.add(
+			"tmdb-modal-content",
+			"tmdb-modal-content--search",
+		);
 		if (this.isMobile) {
-			this.modalEl.classList.add('tmdb-modal--mobile');
-			contentEl.classList.add('tmdb-modal-content--mobile');
+			this.modalEl.classList.add("tmdb-modal--mobile");
+			contentEl.classList.add("tmdb-modal-content--mobile");
 		}
 
-		const headerSection = document.createElement('div');
-		headerSection.className = 'tmdb-modal-section tmdb-modal-header';
+		const headerSection = document.createElement("div");
+		headerSection.className = "tmdb-modal-section tmdb-modal-header";
 
-		const h2 = document.createElement('h2');
-		h2.className = 'tmdb-modal-title';
+		const h2 = document.createElement("h2");
+		h2.className = "tmdb-modal-title";
 		h2.textContent = this.getModalTitle();
 		headerSection.appendChild(h2);
 
 		// Provider indicator
 		const providerIndicator = this.buildProviderIndicator();
 		if (this.isMobile) {
-			providerIndicator.classList.add('tmdb-provider-indicator--inline');
+			providerIndicator.classList.add("tmdb-provider-indicator--inline");
 		} else {
 			headerSection.appendChild(providerIndicator);
 		}
@@ -62,29 +74,29 @@ export class MediaSearchModal extends Modal {
 
 		// Provider selection
 		const providerSelection = this.buildProviderSelection();
-		const providerSection = document.createElement('div');
-		providerSection.className = 'tmdb-modal-section tmdb-provider-section';
+		const providerSection = document.createElement("div");
+		providerSection.className = "tmdb-modal-section tmdb-provider-section";
 
-		const providerToggleBar = document.createElement('div');
-		providerToggleBar.className = 'tmdb-provider-toggle';
+		const providerToggleBar = document.createElement("div");
+		providerToggleBar.className = "tmdb-provider-toggle";
 
-		const providerToggleLabel = document.createElement('span');
-		providerToggleLabel.className = 'tmdb-provider-toggle__label';
-		providerToggleLabel.textContent = 'Providers';
+		const providerToggleLabel = document.createElement("span");
+		providerToggleLabel.className = "tmdb-provider-toggle__label";
+		providerToggleLabel.textContent = "Providers";
 		providerToggleBar.appendChild(providerToggleLabel);
 
-		const providerToggleBtn = document.createElement('button');
-		providerToggleBtn.type = 'button';
-		providerToggleBtn.className = 'tmdb-provider-toggle__button';
-		providerToggleBtn.textContent = 'Hide providers';
-		providerToggleBtn.setAttribute('aria-expanded', 'true');
+		const providerToggleBtn = document.createElement("button");
+		providerToggleBtn.type = "button";
+		providerToggleBtn.className = "tmdb-provider-toggle__button";
+		providerToggleBtn.textContent = "Hide providers";
+		providerToggleBtn.setAttribute("aria-expanded", "true");
 		providerToggleBar.appendChild(providerToggleBtn);
 
-		const providerContent = document.createElement('div');
-		providerContent.className = 'tmdb-provider-content';
+		const providerContent = document.createElement("div");
+		providerContent.className = "tmdb-provider-content";
 		const providerContentId = `tmdb-provider-content-${Date.now()}`;
 		providerContent.id = providerContentId;
-		providerToggleBtn.setAttribute('aria-controls', providerContentId);
+		providerToggleBtn.setAttribute("aria-controls", providerContentId);
 		providerContent.appendChild(providerSelection);
 
 		providerSection.appendChild(providerToggleBar);
@@ -95,36 +107,36 @@ export class MediaSearchModal extends Modal {
 		contentEl.appendChild(providerSection);
 
 		// Search input
-		const searchSection = document.createElement('div');
-		searchSection.className = 'tmdb-modal-section tmdb-search-section';
+		const searchSection = document.createElement("div");
+		searchSection.className = "tmdb-modal-section tmdb-search-section";
 
-		const searchContainer = document.createElement('div');
-		searchContainer.className = 'tmdb-search-container';
+		const searchContainer = document.createElement("div");
+		searchContainer.className = "tmdb-search-container";
 		searchSection.appendChild(searchContainer);
-		
-		const searchInput = document.createElement('input');
-		searchInput.type = 'text';
+
+		const searchInput = document.createElement("input");
+		searchInput.type = "text";
 		searchInput.placeholder = this.getSearchPlaceholder();
-		searchInput.className = 'tmdb-search-input';
+		searchInput.className = "tmdb-search-input";
 		searchContainer.appendChild(searchInput);
 
-		const searchButton = document.createElement('button');
-		searchButton.type = 'button';
-		searchButton.textContent = 'Search';
-		searchButton.className = 'tmdb-search-button';
+		const searchButton = document.createElement("button");
+		searchButton.type = "button";
+		searchButton.textContent = "Search";
+		searchButton.className = "tmdb-search-button";
 		searchContainer.appendChild(searchButton);
 
-		const searchHint = document.createElement('p');
-		searchHint.className = 'tmdb-search-hint';
-		searchHint.textContent = 'Tap Search or press Enter to run the query.';
+		const searchHint = document.createElement("p");
+		searchHint.className = "tmdb-search-hint";
+		searchHint.textContent = "Tap Search or press Enter to run the query.";
 		searchSection.appendChild(searchHint);
 		contentEl.appendChild(searchSection);
 
 		// Results container
-		const resultsSection = document.createElement('div');
-		resultsSection.className = 'tmdb-modal-section tmdb-results-section';
-		const resultsContainer = document.createElement('div');
-		resultsContainer.className = 'tmdb-results-container';
+		const resultsSection = document.createElement("div");
+		resultsSection.className = "tmdb-modal-section tmdb-results-section";
+		const resultsContainer = document.createElement("div");
+		resultsContainer.className = "tmdb-results-container";
 		resultsSection.appendChild(resultsContainer);
 		contentEl.appendChild(resultsSection);
 
@@ -132,56 +144,81 @@ export class MediaSearchModal extends Modal {
 		const performSearch = async () => {
 			const query = searchInput.value.trim();
 			if (!query) {
-				new Notice('Please enter a search query.');
+				new Notice("Please enter a search query.");
 				return;
 			}
 
-			while (resultsContainer.firstChild) resultsContainer.removeChild(resultsContainer.firstChild);
-			const searchingP = document.createElement('p');
-			searchingP.textContent = 'Searching...';
+			while (resultsContainer.firstChild)
+				resultsContainer.removeChild(resultsContainer.firstChild);
+			const searchingP = document.createElement("p");
+			searchingP.textContent = "Searching...";
 			resultsContainer.appendChild(searchingP);
 
 			let results: MediaItem[] = [];
 
 			try {
 				const selectedProviders = this.getSelectedProviders();
-				
+
 				if (selectedProviders.length === 0) {
-					new Notice('Please select at least one provider.');
+					new Notice("Please select at least one provider.");
 					return;
 				}
 
 				// Search based on selected providers
-				if (selectedProviders.includes('tmdb')) {
-					if (this.searchType === 'movie' || this.searchType === 'both') {
-						const movieResults = await this.mediaService.searchMovies(query);
+				if (selectedProviders.includes("tmdb")) {
+					if (
+						this.searchType === "movie" ||
+						this.searchType === "both"
+					) {
+						const movieResults =
+							await this.mediaService.searchMovies(query);
 						results = results.concat(movieResults);
 					}
 
-					if (this.searchType === 'tv' || this.searchType === 'both') {
-						const tvResults = await this.mediaService.searchTVShows(query);
+					if (
+						this.searchType === "tv" ||
+						this.searchType === "both"
+					) {
+						const tvResults =
+							await this.mediaService.searchTVShows(query);
 						results = results.concat(tvResults);
 					}
 				}
 
-				if (selectedProviders.includes('jikan') || selectedProviders.includes('anilist') || selectedProviders.includes('kitsu')) {
-					if (this.searchType === 'anime' || this.searchType === 'both') {
-						const animeResults = await this.mediaService.searchAnime(query);
+				if (
+					selectedProviders.includes("jikan") ||
+					selectedProviders.includes("anilist") ||
+					selectedProviders.includes("kitsu")
+				) {
+					if (
+						this.searchType === "anime" ||
+						this.searchType === "both"
+					) {
+						const animeResults =
+							await this.mediaService.searchAnime(query);
 						results = results.concat(animeResults);
 					}
 				}
 
 				this.searchResults = results;
 				this.displayResults(resultsContainer);
+				if (this.isMobile) {
+					requestAnimationFrame(() => {
+						resultsSection.scrollIntoView({
+							behavior: "smooth",
+							block: "start",
+						});
+					});
+				}
 			} catch (error) {
-				console.error('Search error:', error);
-				new Notice('Error performing search. Please try again.');
+				console.error("Search error:", error);
+				new Notice("Error performing search. Please try again.");
 			}
 		};
 
-		searchButton.addEventListener('click', performSearch);
-		searchInput.addEventListener('keypress', (e: KeyboardEvent) => {
-			if (e.key === 'Enter') {
+		searchButton.addEventListener("click", performSearch);
+		searchInput.addEventListener("keypress", (e: KeyboardEvent) => {
+			if (e.key === "Enter") {
 				performSearch();
 			}
 		});
@@ -190,19 +227,29 @@ export class MediaSearchModal extends Modal {
 		let providersCollapsed = false;
 		const setProvidersCollapsed = (collapsed: boolean) => {
 			providersCollapsed = collapsed;
-			providerContent.classList.toggle('is-hidden', collapsed);
-			providerSection.classList.toggle('is-collapsed', collapsed);
-			providerContent.setAttribute('aria-hidden', collapsed ? 'true' : 'false');
-			providerToggleBtn.textContent = collapsed ? 'Show providers' : 'Hide providers';
-			providerToggleBtn.setAttribute('aria-expanded', (!collapsed).toString());
+			providerContent.classList.toggle("is-hidden", collapsed);
+			providerSection.classList.toggle("is-collapsed", collapsed);
+			providerContent.setAttribute(
+				"aria-hidden",
+				collapsed ? "true" : "false",
+			);
+			providerToggleBtn.textContent = collapsed
+				? "Show providers"
+				: "Hide providers";
+			providerToggleBtn.setAttribute(
+				"aria-expanded",
+				(!collapsed).toString(),
+			);
 		};
 
-		const defaultCollapsed = this.isMobile || (typeof window !== 'undefined' && window.innerWidth < 700);
+		const defaultCollapsed =
+			this.isMobile ||
+			(typeof window !== "undefined" && window.innerWidth < 700);
 		if (defaultCollapsed) {
 			setProvidersCollapsed(true);
 		}
 
-		providerToggleBtn.addEventListener('click', () => {
+		providerToggleBtn.addEventListener("click", () => {
 			setProvidersCollapsed(!providersCollapsed);
 		});
 
@@ -212,85 +259,89 @@ export class MediaSearchModal extends Modal {
 
 	private getModalTitle(): string {
 		switch (this.searchType) {
-			case 'movie':
-				return 'Search Movies';
-			case 'tv':
-				return 'Search TV Shows';
-			case 'anime':
-				return 'Search Anime';
-			case 'both':
+			case "movie":
+				return "Search Movies";
+			case "tv":
+				return "Search TV Shows";
+			case "anime":
+				return "Search Anime";
+			case "both":
 			default:
-				return 'Search Media';
+				return "Search Media";
 		}
 	}
 
 	private getSearchPlaceholder(): string {
 		switch (this.searchType) {
-			case 'movie':
-				return 'Search for movies...';
-			case 'tv':
-				return 'Search for TV shows...';
-			case 'anime':
-				return 'Search for anime...';
-			case 'both':
+			case "movie":
+				return "Search for movies...";
+			case "tv":
+				return "Search for TV shows...";
+			case "anime":
+				return "Search for anime...";
+			case "both":
 			default:
-				return 'Search for movies, TV shows, or anime...';
+				return "Search for movies, TV shows, or anime...";
 		}
 	}
 
 	private buildProviderIndicator(): HTMLElement {
-		const container = document.createElement('div');
-		container.className = 'tmdb-provider-indicator';
+		const container = document.createElement("div");
+		container.className = "tmdb-provider-indicator";
 		const providers = [];
-		
-		if (this.searchType === 'movie' || this.searchType === 'tv' || this.searchType === 'both') {
+
+		if (
+			this.searchType === "movie" ||
+			this.searchType === "tv" ||
+			this.searchType === "both"
+		) {
 			providers.push({
-				name: 'TMDB',
-				icon: '🎬',
-				status: this.settings.apiKey ? 'active' : 'inactive',
-				description: 'The Movie Database'
+				name: "TMDB",
+				icon: "🎬",
+				status: this.settings.apiKey ? "active" : "inactive",
+				description: "The Movie Database",
 			});
 		}
-		
-		if (this.searchType === 'anime' || this.searchType === 'both') {
+
+		if (this.searchType === "anime" || this.searchType === "both") {
 			const animeProvider = this.settings.animeProvider;
 			const animeConfig = this.getAnimeProviderConfig(animeProvider);
 			providers.push({
 				name: animeConfig.name,
 				icon: animeConfig.icon,
-				status: animeConfig.enabled ? 'active' : 'inactive',
-				description: animeConfig.description || 'Anime Database'
+				status: animeConfig.enabled ? "active" : "inactive",
+				description: animeConfig.description || "Anime Database",
 			});
 		}
-		
+
 		for (const provider of providers) {
-			const chip = document.createElement('span');
+			const chip = document.createElement("span");
 			chip.className = `tmdb-provider-chip ${provider.status}`;
 			chip.title = provider.description;
 			chip.setAttribute(
-				'aria-label',
-				`${provider.name} ${provider.status === 'active' ? 'ready' : 'needs setup'}`
+				"aria-label",
+				`${provider.name} ${provider.status === "active" ? "ready" : "needs setup"}`,
 			);
 
 			if (provider.icon) {
-				const icon = document.createElement('span');
-				icon.className = 'tmdb-provider-chip__icon';
+				const icon = document.createElement("span");
+				icon.className = "tmdb-provider-chip__icon";
 				icon.textContent = provider.icon;
 				chip.appendChild(icon);
 			}
 
-			const name = document.createElement('span');
-			name.className = 'tmdb-provider-chip__name';
+			const name = document.createElement("span");
+			name.className = "tmdb-provider-chip__name";
 			name.textContent = provider.name;
 			chip.appendChild(name);
 
-			const status = document.createElement('span');
-			status.className = 'tmdb-provider-chip__status';
-			status.textContent = provider.status === 'active' ? '✓' : '!';
+			const status = document.createElement("span");
+			status.className = "tmdb-provider-chip__status";
+			status.textContent = provider.status === "active" ? "✓" : "!";
 			chip.appendChild(status);
 
-			const description = document.createElement('span');
-			description.className = 'tmdb-visually-hidden';
+			const description = document.createElement("span");
+			description.className = "tmdb-visually-hidden";
 			description.textContent = provider.description;
 			chip.appendChild(description);
 
@@ -299,92 +350,101 @@ export class MediaSearchModal extends Modal {
 		return container;
 	}
 
-	private getAnimeProviderConfig(provider: string): { name: string; enabled: boolean; description: string; icon: string } {
+	private getAnimeProviderConfig(provider: string): {
+		name: string;
+		enabled: boolean;
+		description: string;
+		icon: string;
+	} {
 		switch (provider) {
-			case 'jikan':
+			case "jikan":
 				return {
-					name: 'Jikan',
+					name: "Jikan",
 					enabled: this.settings.jikanConfig.enabled,
-					description: 'MyAnimeList API',
-					icon: '🎌'
+					description: "MyAnimeList API",
+					icon: "🎌",
 				};
-			case 'anilist':
+			case "anilist":
 				return {
-					name: 'AniList',
+					name: "AniList",
 					enabled: this.settings.anilistConfig.enabled,
-					description: 'AniList GraphQL API',
-					icon: '📊'
+					description: "AniList GraphQL API",
+					icon: "📊",
 				};
-			case 'kitsu':
+			case "kitsu":
 				return {
-					name: 'Kitsu',
+					name: "Kitsu",
 					enabled: this.settings.kitsuConfig.enabled,
-					description: 'Kitsu API',
-					icon: '🎭'
+					description: "Kitsu API",
+					icon: "🎭",
 				};
 			default:
 				return {
-					name: 'Unknown',
+					name: "Unknown",
 					enabled: false,
-					description: 'Unknown Provider',
-					icon: '❔'
+					description: "Unknown Provider",
+					icon: "❔",
 				};
 		}
 	}
 
 	private buildProviderSelection(): HTMLElement {
 		const providers = this.getAvailableProviders();
-		const wrapper = document.createElement('div');
-		wrapper.className = 'tmdb-provider-selection';
-		const header = document.createElement('div');
-		header.className = 'provider-selection-header';
-		const title = document.createElement('span');
-		title.className = 'provider-selection-title';
-		title.textContent = 'Select Providers:';
-		const controls = document.createElement('div');
-		controls.className = 'provider-selection-controls';
-		const selectAll = document.createElement('button');
-		selectAll.className = 'provider-select-all-btn';
-		selectAll.textContent = 'Select All';
-		selectAll.addEventListener('click', () => {
-			const checkboxes = wrapper.querySelectorAll('.provider-checkbox:not(:disabled)') as NodeListOf<HTMLInputElement>;
-			checkboxes.forEach(cb => cb.checked = true);
+		const wrapper = document.createElement("div");
+		wrapper.className = "tmdb-provider-selection";
+		const header = document.createElement("div");
+		header.className = "provider-selection-header";
+		const title = document.createElement("span");
+		title.className = "provider-selection-title";
+		title.textContent = "Select Providers:";
+		const controls = document.createElement("div");
+		controls.className = "provider-selection-controls";
+		const selectAll = document.createElement("button");
+		selectAll.className = "provider-select-all-btn";
+		selectAll.textContent = "Select All";
+		selectAll.addEventListener("click", () => {
+			const checkboxes = wrapper.querySelectorAll(
+				".provider-checkbox:not(:disabled)",
+			) as NodeListOf<HTMLInputElement>;
+			checkboxes.forEach((cb) => (cb.checked = true));
 		});
-		const selectNone = document.createElement('button');
-		selectNone.className = 'provider-select-none-btn';
-		selectNone.textContent = 'Select None';
-		selectNone.addEventListener('click', () => {
-			const checkboxes = wrapper.querySelectorAll('.provider-checkbox') as NodeListOf<HTMLInputElement>;
-			checkboxes.forEach(cb => cb.checked = false);
+		const selectNone = document.createElement("button");
+		selectNone.className = "provider-select-none-btn";
+		selectNone.textContent = "Select None";
+		selectNone.addEventListener("click", () => {
+			const checkboxes = wrapper.querySelectorAll(
+				".provider-checkbox",
+			) as NodeListOf<HTMLInputElement>;
+			checkboxes.forEach((cb) => (cb.checked = false));
 		});
 		controls.appendChild(selectAll);
 		controls.appendChild(selectNone);
 		header.appendChild(title);
 		header.appendChild(controls);
 		wrapper.appendChild(header);
-		const grid = document.createElement('div');
-		grid.className = 'provider-selection-grid';
+		const grid = document.createElement("div");
+		grid.className = "provider-selection-grid";
 		for (const provider of providers) {
-			const item = document.createElement('div');
-			item.className = 'provider-selection-item';
-			const label = document.createElement('label');
-			label.className = 'provider-checkbox-label';
-			const input = document.createElement('input');
-			input.type = 'checkbox';
-			input.className = 'provider-checkbox';
+			const item = document.createElement("div");
+			item.className = "provider-selection-item";
+			const label = document.createElement("label");
+			label.className = "provider-checkbox-label";
+			const input = document.createElement("input");
+			input.type = "checkbox";
+			input.className = "provider-checkbox";
 			input.dataset.provider = provider.id;
 			input.checked = provider.enabled;
 			input.disabled = !provider.available;
-			const text = document.createElement('span');
-			text.className = 'provider-checkbox-text';
-			const icon = document.createElement('span');
-			icon.className = 'provider-icon';
+			const text = document.createElement("span");
+			text.className = "provider-checkbox-text";
+			const icon = document.createElement("span");
+			icon.className = "provider-icon";
 			icon.textContent = provider.icon;
-			const name = document.createElement('span');
-			name.className = 'provider-name';
+			const name = document.createElement("span");
+			name.className = "provider-name";
 			name.textContent = provider.name;
-			const desc = document.createElement('span');
-			desc.className = 'provider-description';
+			const desc = document.createElement("span");
+			desc.className = "provider-description";
 			desc.textContent = provider.description;
 			text.appendChild(icon);
 			text.appendChild(name);
@@ -408,84 +468,102 @@ export class MediaSearchModal extends Modal {
 	}> {
 		return [
 			{
-				id: 'tmdb',
-				name: 'TMDB',
-				icon: '🎬',
-				description: 'Movies & TV Shows',
+				id: "tmdb",
+				name: "TMDB",
+				icon: "🎬",
+				description: "Movies & TV Shows",
 				enabled: this.settings.enabledProviders.tmdb,
-				available: !!this.settings.apiKey
+				available: !!this.settings.apiKey,
 			},
 			{
-				id: 'jikan',
-				name: 'Jikan',
-				icon: '🎌',
-				description: 'Anime (MyAnimeList)',
+				id: "jikan",
+				name: "Jikan",
+				icon: "🎌",
+				description: "Anime (MyAnimeList)",
 				enabled: this.settings.enabledProviders.jikan,
-				available: this.settings.jikanConfig.enabled
+				available: this.settings.jikanConfig.enabled,
 			},
 			{
-				id: 'anilist',
-				name: 'AniList',
-				icon: '📊',
-				description: 'Anime (AniList)',
+				id: "anilist",
+				name: "AniList",
+				icon: "📊",
+				description: "Anime (AniList)",
 				enabled: this.settings.enabledProviders.anilist,
-				available: this.settings.anilistConfig.enabled
+				available: this.settings.anilistConfig.enabled,
 			},
 			{
-				id: 'kitsu',
-				name: 'Kitsu',
-				icon: '🎭',
-				description: 'Anime (Kitsu)',
+				id: "kitsu",
+				name: "Kitsu",
+				icon: "🎭",
+				description: "Anime (Kitsu)",
 				enabled: this.settings.enabledProviders.kitsu,
-				available: this.settings.kitsuConfig.enabled
-			}
+				available: this.settings.kitsuConfig.enabled,
+			},
 		];
 	}
 
-	private addProviderSelectionListeners(providerSelection: HTMLElement): void {
+	private addProviderSelectionListeners(
+		providerSelection: HTMLElement,
+	): void {
 		// Select All button
-		const selectAllBtn = providerSelection.querySelector('.provider-select-all-btn') as HTMLButtonElement;
+		const selectAllBtn = providerSelection.querySelector(
+			".provider-select-all-btn",
+		) as HTMLButtonElement;
 		if (selectAllBtn) {
-			selectAllBtn.addEventListener('click', () => {
-				const checkboxes = providerSelection.querySelectorAll('.provider-checkbox:not(:disabled)') as NodeListOf<HTMLInputElement>;
-				checkboxes.forEach(checkbox => {
+			selectAllBtn.addEventListener("click", () => {
+				const checkboxes = providerSelection.querySelectorAll(
+					".provider-checkbox:not(:disabled)",
+				) as NodeListOf<HTMLInputElement>;
+				checkboxes.forEach((checkbox) => {
 					checkbox.checked = true;
 				});
 			});
 		}
 
 		// Select None button
-		const selectNoneBtn = providerSelection.querySelector('.provider-select-none-btn') as HTMLButtonElement;
+		const selectNoneBtn = providerSelection.querySelector(
+			".provider-select-none-btn",
+		) as HTMLButtonElement;
 		if (selectNoneBtn) {
-			selectNoneBtn.addEventListener('click', () => {
-				const checkboxes = providerSelection.querySelectorAll('.provider-checkbox') as NodeListOf<HTMLInputElement>;
-				checkboxes.forEach(checkbox => {
+			selectNoneBtn.addEventListener("click", () => {
+				const checkboxes = providerSelection.querySelectorAll(
+					".provider-checkbox",
+				) as NodeListOf<HTMLInputElement>;
+				checkboxes.forEach((checkbox) => {
 					checkbox.checked = false;
 				});
 			});
 		}
 
 		// Individual checkbox listeners
-		const checkboxes = providerSelection.querySelectorAll('.provider-checkbox') as NodeListOf<HTMLInputElement>;
-		checkboxes.forEach(checkbox => {
-			checkbox.addEventListener('change', () => {
-				this.updateProviderSelection(checkbox.dataset.provider!, checkbox.checked);
+		const checkboxes = providerSelection.querySelectorAll(
+			".provider-checkbox",
+		) as NodeListOf<HTMLInputElement>;
+		checkboxes.forEach((checkbox) => {
+			checkbox.addEventListener("change", () => {
+				this.updateProviderSelection(
+					checkbox.dataset.provider!,
+					checkbox.checked,
+				);
 			});
 		});
 	}
 
-	private updateProviderSelection(providerId: string, enabled: boolean): void {
+	private updateProviderSelection(
+		providerId: string,
+		enabled: boolean,
+	): void {
 		switch (providerId) {
-			case 'tmdb':
+			case "tmdb":
 				this.settings.enabledProviders.tmdb = enabled;
 				break;
-			case 'jikan':
+			case "jikan":
 				this.settings.enabledProviders.jikan = enabled;
 				break;
-			case 'anilist':
+			case "anilist":
 				this.settings.enabledProviders.anilist = enabled;
 				break;
-			case 'kitsu':
+			case "kitsu":
 				this.settings.enabledProviders.kitsu = enabled;
 				break;
 		}
@@ -493,132 +571,144 @@ export class MediaSearchModal extends Modal {
 
 	private getSelectedProviders(): string[] {
 		const selected: string[] = [];
-		if (this.settings.enabledProviders.tmdb) selected.push('tmdb');
-		if (this.settings.enabledProviders.jikan) selected.push('jikan');
-		if (this.settings.enabledProviders.anilist) selected.push('anilist');
-		if (this.settings.enabledProviders.kitsu) selected.push('kitsu');
+		if (this.settings.enabledProviders.tmdb) selected.push("tmdb");
+		if (this.settings.enabledProviders.jikan) selected.push("jikan");
+		if (this.settings.enabledProviders.anilist) selected.push("anilist");
+		if (this.settings.enabledProviders.kitsu) selected.push("kitsu");
 		return selected;
 	}
 
 	private displayResults(container: HTMLElement) {
-		while (container.firstChild) container.removeChild(container.firstChild);
+		while (container.firstChild)
+			container.removeChild(container.firstChild);
 
 		if (this.searchResults.length === 0) {
-			const p = document.createElement('p');
-			p.className = 'tmdb-results-empty';
-			p.textContent = 'No results found.';
+			const p = document.createElement("p");
+			p.className = "tmdb-results-empty";
+			p.textContent = "No results found.";
 			container.appendChild(p);
 			return;
 		}
 
-		const h3 = document.createElement('h3');
-		h3.className = 'tmdb-results-title';
-		h3.textContent = 'Search Results';
+		const h3 = document.createElement("h3");
+		h3.className = "tmdb-results-title";
+		h3.textContent = "Search Results";
 		container.appendChild(h3);
 
-		this.searchResults.forEach(item => {
-			const resultItem = document.createElement('div');
-			resultItem.className = 'tmdb-result-item';
+		this.searchResults.forEach((item) => {
+			const resultItem = document.createElement("div");
+			resultItem.className = "tmdb-result-item";
 			container.appendChild(resultItem);
-			
+
 			// Poster image
 			const posterPath = this.getPosterPath(item);
 			if (posterPath) {
-				const img = document.createElement('img');
+				const img = document.createElement("img");
 				img.src = posterPath;
-				img.className = 'tmdb-poster';
+				img.className = "tmdb-poster";
 				img.alt = `${this.getTitle(item)} poster`;
 				resultItem.appendChild(img);
 			}
 
 			// Content
-			const content = document.createElement('div');
-			content.className = 'tmdb-result-content';
+			const content = document.createElement("div");
+			content.className = "tmdb-result-content";
 			resultItem.appendChild(content);
-			
+
 			const title = this.getTitle(item);
 			const year = this.getYear(item);
-			
-			const h4 = document.createElement('h4');
-			h4.className = 'tmdb-result-title';
-			h4.textContent = year !== 'N/A' ? `${title} (${year})` : title;
+
+			const h4 = document.createElement("h4");
+			h4.className = "tmdb-result-title";
+			h4.textContent = year !== "N/A" ? `${title} (${year})` : title;
 			content.appendChild(h4);
 
 			// Provider indicator for each result
 			const providerIndicator = this.buildResultProviderIndicator(item);
 			content.appendChild(providerIndicator);
-			
-			const overviewP = document.createElement('p');
-			overviewP.className = 'tmdb-result-overview';
+
+			const overviewP = document.createElement("p");
+			overviewP.className = "tmdb-result-overview";
 			overviewP.textContent = this.getOverview(item);
 			content.appendChild(overviewP);
-			
-			const ratingP = document.createElement('p');
-			ratingP.className = 'tmdb-result-rating';
+
+			const ratingP = document.createElement("p");
+			ratingP.className = "tmdb-result-rating";
 			ratingP.textContent = this.getRatingText(item);
 			content.appendChild(ratingP);
 
 			// Action buttons
-			const buttonContainer = document.createElement('div');
-			buttonContainer.className = 'tmdb-button-container';
+			const buttonContainer = document.createElement("div");
+			buttonContainer.className = "tmdb-button-container";
 			content.appendChild(buttonContainer);
 
 			// Preview button
-			const previewButton = document.createElement('button');
-			previewButton.textContent = 'Preview';
-			previewButton.className = 'tmdb-preview-button';
+			const previewButton = document.createElement("button");
+			previewButton.textContent = "Preview";
+			previewButton.className = "tmdb-preview-button";
 			buttonContainer.appendChild(previewButton);
 
 			// Insert button
-			const insertButton = document.createElement('button');
-			insertButton.textContent = 'Insert into Editor';
-			insertButton.className = 'tmdb-insert-button';
+			const insertButton = document.createElement("button");
+			insertButton.textContent = "Insert into Editor";
+			insertButton.className = "tmdb-insert-button";
 			buttonContainer.appendChild(insertButton);
 
 			// Save button
-			const saveButton = document.createElement('button');
-			saveButton.textContent = 'Save to Folder';
-			saveButton.className = 'tmdb-save-button';
+			const saveButton = document.createElement("button");
+			saveButton.textContent = "Save to Folder";
+			saveButton.className = "tmdb-save-button";
 			buttonContainer.appendChild(saveButton);
 
 			// Event listeners
-			previewButton.addEventListener('click', async () => {
+			previewButton.addEventListener("click", async () => {
 				const formattedData = await this.formatItemData(item);
 				this.showPreview(formattedData, item);
 			});
 
-			insertButton.addEventListener('click', async () => {
+			insertButton.addEventListener("click", async () => {
 				const formattedData = await this.formatItemData(item);
 				this.fileManager.insertIntoEditor(formattedData);
 				this.close();
 			});
 
-			saveButton.addEventListener('click', async () => {
+			saveButton.addEventListener("click", async () => {
 				const formattedData = await this.formatItemData(item);
 				const fileName = this.settings.fileNameTemplate;
-				await this.fileManager.saveToFile(formattedData, fileName, item, this.settings);
+				await this.fileManager.saveToFile(
+					formattedData,
+					fileName,
+					item,
+					this.settings,
+				);
 				this.close();
 			});
 		});
 	}
 
 	private getPosterPath(item: MediaItem): string {
-		if ('mal_id' in item) {
+		if ("mal_id" in item) {
 			// Anime
 			const anime = item as JikanAnime;
-			return anime.images?.jpg?.large_image_url || anime.images?.webp?.large_image_url || '';
-		} else if ('poster_path' in item) {
+			return (
+				anime.images?.jpg?.large_image_url ||
+				anime.images?.webp?.large_image_url ||
+				""
+			);
+		} else if ("poster_path" in item) {
 			// TMDB Movie or TV Show
 			const tmdbItem = item as TMDBMovie | TMDBTVShow;
-			return tmdbItem.poster_path ? `https://image.tmdb.org/t/p/w200${tmdbItem.poster_path}` : '';
+			return tmdbItem.poster_path
+				? `https://image.tmdb.org/t/p/w200${tmdbItem.poster_path}`
+				: "";
 		}
-		return '';
+		return "";
 	}
 
 	private getTitle(item: MediaItem): string {
-		if ('mal_id' in item) {
+		if ("mal_id" in item) {
 			return (item as JikanAnime).title;
-		} else if ('title' in item) {
+		} else if ("title" in item) {
 			return (item as TMDBMovie).title;
 		} else {
 			return (item as TMDBTVShow).name;
@@ -626,30 +716,37 @@ export class MediaSearchModal extends Modal {
 	}
 
 	private getYear(item: MediaItem): string {
-		if ('mal_id' in item) {
+		if ("mal_id" in item) {
 			const anime = item as JikanAnime;
-			return anime.year?.toString() || 'N/A';
-		} else if ('release_date' in item) {
+			return anime.year?.toString() || "N/A";
+		} else if ("release_date" in item) {
 			const movie = item as TMDBMovie;
-			return movie.release_date ? new Date(movie.release_date).getFullYear().toString() : 'N/A';
+			return movie.release_date
+				? new Date(movie.release_date).getFullYear().toString()
+				: "N/A";
 		} else {
 			const tvShow = item as TMDBTVShow;
-			return tvShow.first_air_date ? new Date(tvShow.first_air_date).getFullYear().toString() : 'N/A';
+			return tvShow.first_air_date
+				? new Date(tvShow.first_air_date).getFullYear().toString()
+				: "N/A";
 		}
 	}
 
 	private getOverview(item: MediaItem): string {
-		if ('mal_id' in item) {
-			return (item as JikanAnime).synopsis || 'No synopsis available.';
+		if ("mal_id" in item) {
+			return (item as JikanAnime).synopsis || "No synopsis available.";
 		} else {
-			return (item as TMDBMovie | TMDBTVShow).overview || 'No overview available.';
+			return (
+				(item as TMDBMovie | TMDBTVShow).overview ||
+				"No overview available."
+			);
 		}
 	}
 
 	private getRatingText(item: MediaItem): string {
-		if ('mal_id' in item) {
+		if ("mal_id" in item) {
 			const anime = item as JikanAnime;
-			return `Score: ${anime.score || 'N/A'}/10 (${anime.scored_by || 0} votes)`;
+			return `Score: ${anime.score || "N/A"}/10 (${anime.scored_by || 0} votes)`;
 		} else {
 			const tmdbItem = item as TMDBMovie | TMDBTVShow;
 			return `Rating: ${tmdbItem.vote_average}/10 (${tmdbItem.vote_count} votes)`;
@@ -657,39 +754,41 @@ export class MediaSearchModal extends Modal {
 	}
 
 	private buildResultProviderIndicator(item: MediaItem): HTMLElement {
-		const container = document.createElement('div');
-		container.className = 'result-provider-indicator';
-		if ('mal_id' in item) {
+		const container = document.createElement("div");
+		container.className = "result-provider-indicator";
+		if ("mal_id" in item) {
 			const animeProvider = this.settings.animeProvider;
 			const animeConfig = this.getAnimeProviderConfig(animeProvider);
-			const chip = document.createElement('span');
-			chip.className = 'tmdb-provider-chip tmdb-provider-chip--result anime';
+			const chip = document.createElement("span");
+			chip.className =
+				"tmdb-provider-chip tmdb-provider-chip--result anime";
 			chip.title = animeConfig.description;
 
-			const icon = document.createElement('span');
-			icon.className = 'tmdb-provider-chip__icon';
+			const icon = document.createElement("span");
+			icon.className = "tmdb-provider-chip__icon";
 			icon.textContent = animeConfig.icon;
 			chip.appendChild(icon);
 
-			const name = document.createElement('span');
-			name.className = 'tmdb-provider-chip__name';
+			const name = document.createElement("span");
+			name.className = "tmdb-provider-chip__name";
 			name.textContent = animeConfig.name;
 			chip.appendChild(name);
 
 			container.appendChild(chip);
 		} else {
-			const chip = document.createElement('span');
-			chip.className = 'tmdb-provider-chip tmdb-provider-chip--result tmdb';
-			chip.title = 'The Movie Database';
+			const chip = document.createElement("span");
+			chip.className =
+				"tmdb-provider-chip tmdb-provider-chip--result tmdb";
+			chip.title = "The Movie Database";
 
-			const icon = document.createElement('span');
-			icon.className = 'tmdb-provider-chip__icon';
-			icon.textContent = '🎬';
+			const icon = document.createElement("span");
+			icon.className = "tmdb-provider-chip__icon";
+			icon.textContent = "🎬";
 			chip.appendChild(icon);
 
-			const name = document.createElement('span');
-			name.className = 'tmdb-provider-chip__name';
-			name.textContent = 'TMDB';
+			const name = document.createElement("span");
+			name.className = "tmdb-provider-chip__name";
+			name.textContent = "TMDB";
 			chip.appendChild(name);
 
 			container.appendChild(chip);
@@ -698,35 +797,65 @@ export class MediaSearchModal extends Modal {
 	}
 
 	private async formatItemData(item: MediaItem): Promise<string> {
-		if ('mal_id' in item) {
+		if ("mal_id" in item) {
 			// Anime
 			const anime = item as JikanAnime;
-			const animeDetails = await this.mediaService.getAnimeDetails(anime.mal_id);
+			const animeDetails = await this.mediaService.getAnimeDetails(
+				anime.mal_id,
+			);
 			const provider = this.settings.animeProvider;
-			return await this.templateFormatter.formatAnimeData(anime, animeDetails, this.settings.animeTemplate, provider);
-		} else if ('title' in item) {
+			return await this.templateFormatter.formatAnimeData(
+				anime,
+				animeDetails,
+				this.settings.animeTemplate,
+				provider,
+			);
+		} else if ("title" in item) {
 			// Movie
 			const movie = item as TMDBMovie;
-			const movieDetails = await this.mediaService.getMovieDetails(movie.id);
-			return await this.templateFormatter.formatMovieData(movie, movieDetails, this.settings.movieTemplate);
+			const movieDetails = await this.mediaService.getMovieDetails(
+				movie.id,
+			);
+			return await this.templateFormatter.formatMovieData(
+				movie,
+				movieDetails,
+				this.settings.movieTemplate,
+			);
 		} else {
 			// TV Show
 			const tvShow = item as TMDBTVShow;
-			const tvDetails = await this.mediaService.getTVShowDetails(tvShow.id);
-			return await this.templateFormatter.formatTVData(tvShow, tvDetails, this.settings.tvTemplate);
+			const tvDetails = await this.mediaService.getTVShowDetails(
+				tvShow.id,
+			);
+			return await this.templateFormatter.formatTVData(
+				tvShow,
+				tvDetails,
+				this.settings.tvTemplate,
+			);
 		}
 	}
 
 	private showPreview(data: string, item: MediaItem): void {
-		new MediaPreviewModal(this.app, data, item, this.templateFormatter, this.fileManager, this.settings).open();
+		new MediaPreviewModal(
+			this.app,
+			data,
+			item,
+			this.templateFormatter,
+			this.fileManager,
+			this.settings,
+		).open();
 	}
 
 	onClose() {
 		const { contentEl } = this;
-		while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
-		contentEl.classList.remove('tmdb-modal-content', 'tmdb-modal-content--search');
-		contentEl.classList.remove('tmdb-modal-content--mobile');
-		this.modalEl.classList.remove('tmdb-modal', 'tmdb-modal--search');
-		this.modalEl.classList.remove('tmdb-modal--mobile');
+		while (contentEl.firstChild)
+			contentEl.removeChild(contentEl.firstChild);
+		contentEl.classList.remove(
+			"tmdb-modal-content",
+			"tmdb-modal-content--search",
+		);
+		contentEl.classList.remove("tmdb-modal-content--mobile");
+		this.modalEl.classList.remove("tmdb-modal", "tmdb-modal--search");
+		this.modalEl.classList.remove("tmdb-modal--mobile");
 	}
 }
